@@ -17,6 +17,9 @@
 Variables should have this format:
 
 ```
+POSTGRES_PORT=5332
+POSTGRES_USER=myuser
+POSTGRES_PASSWORD=secret
 ```
 
 ### 3. Building
