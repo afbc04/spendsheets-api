@@ -1,0 +1,33 @@
+services:
+
+  #api:
+  #  build: ./business/
+  #  container_name: mybus-api
+  #  volumes:
+  #    - ./business/src:/api/src
+  #  ports:
+  #    - "${API_PORT}:80"
+  #  env_file:
+  #    - .env
+  #  tty: true
+  #  depends_on:
+  #    - database
+  #  networks:
+  #    - api-to-database
+
+  database:
+    image: postgres:15
+    container_name: ss-database
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: spendSheet
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - ./project/database/data:/var/lib/postgresql/data
+    networks:
+      - api-to-database
+
+networks:
+  api-to-database:
