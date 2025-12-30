@@ -13,7 +13,6 @@
 2. User provides:
     - Name
     - Description _(Optional)_
-    - Type
 3. System validates the information provided
 4. System determines the ID and Creation Date of new category
 5. System saves the new category, providing the ID to the user 

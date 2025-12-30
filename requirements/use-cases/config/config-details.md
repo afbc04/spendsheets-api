@@ -15,5 +15,3 @@
     - Username
     - Is visible to public?
     - Last open date
-    - Is token valid?
-    - Is writer?

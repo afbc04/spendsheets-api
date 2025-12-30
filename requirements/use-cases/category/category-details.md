@@ -14,5 +14,3 @@
     - ID
     - Name
     - Description
-    - When was created
-    - Type

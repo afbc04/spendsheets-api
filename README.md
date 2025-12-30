@@ -16,10 +16,12 @@
 
 Variables should have this format:
 
-```
+```.env
 POSTGRES_PORT=5332
-POSTGRES_USER=myuser
-POSTGRES_PASSWORD=secret
+POSTGRES_DB=spendSheetDev
+POSTGRES_USER=admin
+POSTGRES_PASSWORD=admin
+API_PORT=7777
 ```
 
 ### 3. Building
