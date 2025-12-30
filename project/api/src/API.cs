@@ -15,6 +15,7 @@ public class API {
             PacketTemplates.TemplateLoader.load_templates();
             await ModelsManager.init();
             API.controller = new();
+            await API.controller.load_settings();
 
             return true;
 

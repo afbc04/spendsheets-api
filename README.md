@@ -17,7 +17,6 @@
 Variables should have this format:
 
 ```.env
-POSTGRES_PORT=5332
 POSTGRES_DB=spendSheetDev
 POSTGRES_USER=admin
 POSTGRES_PASSWORD=admin
@@ -37,6 +36,8 @@ API_PORT=7777
     docker compose down
 
 ### Extra Usage
+
+    docker exec -it ss-database psql -U admin -d spendSheetDev
 
 # Report
 

@@ -15,7 +15,7 @@ namespace DTO {
         private Config _config;
 
         public ConfigDTO() {
-            this._config = new Config("","");
+            this._config = new Config("",[]);
         }
 
         public ConfigDTO(Config config) {

@@ -16,14 +16,13 @@ namespace Models {
 
         public static readonly string connection_string = $@"
             Host=database;
-            Port={Environment.GetEnvironmentVariable("POSTGRES_PORT")};
-            Database=myBus;
+            Database={Environment.GetEnvironmentVariable("POSTGRES_DB")};
             Username={Environment.GetEnvironmentVariable("POSTGRES_USER")};
             Password={Environment.GetEnvironmentVariable("POSTGRES_PASSWORD")}";
 
         public static async Task init() {
 
-            //await ModelTableCreator.country_codes();
+            await ModelTableCreator.config();
             //await ModelTableCreator.bus_passes();
             //await ModelTableCreator.users();
             //await ModelTableCreator.users_view();

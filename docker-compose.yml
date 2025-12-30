@@ -22,8 +22,6 @@ services:
     container_name: ss-database
     env_file:
       - .env
-    ports:
-      - "${POSTGRES_PORT}:5432"
     volumes:
       - ./project/database/data:/var/lib/postgresql/data
     networks:

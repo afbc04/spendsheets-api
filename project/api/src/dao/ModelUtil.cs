@@ -90,6 +90,10 @@ namespace Models {
             return reader.IsDBNull(index) ? null : reader.GetDateTime(index);
         }
 
+        public static ulong get_money(NpgsqlDataReader reader, int index) {
+            return (ulong) reader.GetInt64(index);
+        }
+
     }
 
 }

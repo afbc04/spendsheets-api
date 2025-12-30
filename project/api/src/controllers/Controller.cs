@@ -16,6 +16,10 @@ namespace Controller {
             this._config = new ConfigController();
         }
 
+        public async Task load_settings() {
+            await this._config.load_settings();
+        }
+
         /// #################################
         ///           CONFIG
         /// #################################

@@ -1,0 +1,3 @@
+-- Config
+
+SELECT * FROM Config;

@@ -8,14 +8,19 @@ public class Config {
     public static readonly int password_length_max = 64;
     public static readonly int name_length_max = 64;
 
+    public int database_version {private set; get;}
+    public DateTime last_online_date{private set; get;}
+
     public string username {set; get;}
-    private string _password;
-    private long _salt;
+
+    public byte[] _password {private set; get;}
+    public byte[] _salt {private set; get;}
+
     public string? name {set; get;}
     public bool is_visible_to_public {set; get;}
-    public uint initial_money {set; get;}
-    public uint lost_money {set; get;}
-    public uint saved_money {set; get;}
+    public ulong initial_money {set; get;}
+    public ulong lost_money {set; get;}
+    public ulong saved_money {set; get;}
 
     public IDictionary<string,object?> to_json() {
         return new Dictionary<string,object?> {
@@ -29,10 +34,14 @@ public class Config {
         };
     }
 
-    public Config(string username, string password) {
+    public Config(string username, byte[] password) {
+
+        this.database_version = 1;
+        this.last_online_date = DateTime.UtcNow;
 
         this.username = username;
         this._password = password;
+        this._salt = [];
 
         this.name = null;
         this.is_visible_to_public = false;
@@ -42,7 +51,10 @@ public class Config {
 
     }
 
-    public Config(string username, string password, long salt, string? name, bool is_visible_to_public, uint initial_money, uint lost_money, uint saved_money) {
+    public Config(int database_version, DateTime last_online_date, string username, byte[] password, byte[] salt, string? name, bool is_visible_to_public, ulong initial_money, ulong lost_money, ulong saved_money) {
+
+        this.database_version = database_version;
+        this.last_online_date = last_online_date;
 
         this.username = username;
         this._password = password;
@@ -58,24 +70,18 @@ public class Config {
 
     public void set_password(string password) {
 
-        byte[] salt_bytes = new byte[8];
-        using (var rng = RandomNumberGenerator.Create())
-            rng.GetBytes(salt_bytes);
+        byte[] salt = RandomNumberGenerator.GetBytes(8);
+        byte[] hash_bytes = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256).GetBytes(32);
 
-        byte[] hash_bytes = new Rfc2898DeriveBytes(password, salt_bytes, 100_000, HashAlgorithmName.SHA256).GetBytes(32);
-
-        this._salt = BitConverter.ToInt64(salt_bytes, 0);
-        this._password = BitConverter.ToString(hash_bytes);
+        this._salt = salt;
+        this._password = hash_bytes;
 
     }
 
     public bool verify_password(string password_to_check) {
 
-        byte[] salt_bytes = BitConverter.GetBytes(this._salt);
-        byte[] hash_bytes = new Rfc2898DeriveBytes(password_to_check, salt_bytes, 100_000, HashAlgorithmName.SHA256).GetBytes(32);
-
-        string hashHex = BitConverter.ToString(hash_bytes);
-        return hashHex == this._password;
+        byte[] hash_bytes = new Rfc2898DeriveBytes(password_to_check, this._salt, 100000, HashAlgorithmName.SHA256).GetBytes(32);
+        return CryptographicOperations.FixedTimeEquals(hash_bytes,this._password);
 
     }
 
