@@ -1,0 +1,57 @@
+<templates>
+
+    <template id="create">
+        <auth />
+        <body required="true">
+            <i name="id" required="true"/>
+            <i name="password" required="true"/>
+            <i name="name"/>
+            <i name="email"/>
+            <i name="birthDate"/>
+            <i name="sex" required="true" />
+            <i name="countryCode"/>
+            <i name="public" required="true" datatype="bool"/>
+            <i name="disablePerson" datatype="bool"/>
+        </body>
+    </template>
+
+    <template id="get">
+        <auth />
+        <query>
+            <q name="mode" />
+        </query>
+    </template>
+
+    <template id="list">
+        <auth />
+        <query page="true" sort="id,name">
+            <q name="level" />
+            <q name="countryCode" />
+            <q name="prefixName" />
+            <q name="active" datatype="bool" />
+            <q name="public" datatype="bool" />
+        </query>
+    </template>
+
+    <template id="delete">
+        <auth required="true"/>
+    </template>
+
+    <template id="update">
+        <auth required="true"/>
+        <body required="true">
+            <i name="password"/>
+            <i name="name"/>
+            <i name="email"/>
+            <i name="birthDate"/>
+            <i name="sex"/>
+            <i name="countryCode"/>
+            <i name="public" datatype="bool"/>
+            <i name="disablePerson" datatype="bool"/>
+            <i name="level" />
+            <i name="busPassID" />
+            <i name="busPassStartDate" />
+        </body>
+    </template>
+
+</templates>

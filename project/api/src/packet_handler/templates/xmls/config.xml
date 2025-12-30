@@ -1,0 +1,61 @@
+<templates>
+
+    <template id="get" />
+
+    <template id="create">
+        <body required="true">
+            <i name="username" required="true"/>
+            <i name="password" required="true"/>
+            <i name="name" />
+            <i name="public" datatype="bool" />
+            <i name="initialMoney" datatype="integer" />
+            <i name="lostMoney" datatype="integer" />
+            <i name="savedMoney" datatype="integer" />
+        </body>
+    </template>
+
+    <template id="update">
+        <body required="true">
+            <i name="username"/>
+            <i name="password"/>
+            <i name="name" />
+            <i name="public" datatype="bool" />
+            <i name="initialMoney" datatype="integer" />
+            <i name="lostMoney" datatype="integer" />
+            <i name="savedMoney" datatype="integer" />
+        </body>
+    </template>
+
+</templates>
+
+<!--templates>
+
+    <template id="create">
+        <auth required="true"/>
+        <body required="true">
+            <i name="id" required="true"/>
+            <i name="name" required="true"/>
+        </body>
+    </template>
+
+    <template id="get">
+        <auth />
+    </template>
+
+    <template id="list">
+        <auth />
+        <query page="true" sort="id,name" />
+    </template>
+
+    <template id="delete">
+        <auth required="true"/>
+    </template>
+
+    <template id="update">
+        <auth required="true"/>
+        <body required="true">
+            <i name="name"/>
+        </body>
+    </template>
+
+</templates-->
