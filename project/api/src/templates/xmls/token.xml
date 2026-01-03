@@ -9,6 +9,7 @@
         <body required="true">
             <i name="username" required="true"/>
             <i name="password" required="true"/>
+            <i name="writer" required="true" datatype="bool"/>
         </body>
     </template>
 

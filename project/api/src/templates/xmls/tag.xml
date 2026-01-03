@@ -1,0 +1,34 @@
+<templates>
+
+    <template id="create">
+        <auth required="true"/>
+        <body required="true">
+            <i name="name" required="true"/>
+            <i name="description" null="true"/>
+        </body>
+    </template>
+
+    <template id="get">
+        <auth />
+    </template>
+
+    <template id="list">
+        <auth />
+        <query page="true" sort="id,name">
+            <q name="name" datatype="string" />
+        </query>
+    </template>
+
+    <template id="delete">
+        <auth required="true"/>
+    </template>
+
+    <template id="update">
+        <auth required="true"/>
+        <body required="true">
+            <i name="name" />
+            <i name="description" null="true"/>
+        </body>
+    </template>
+
+</templates>

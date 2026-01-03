@@ -3,7 +3,7 @@ using Serilog;
 
 public class ProgramHandler {
 
-    public static void start_logger() {
+    public static void StartLogger() {
 
         Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
@@ -12,7 +12,7 @@ public class ProgramHandler {
 
     }
 
-    public static async Task log_requests(HttpContext context, Func<Task> next) {
+    public static async Task LogRequests(HttpContext context, Func<Task> next) {
 
         var begin_time = DateTime.UtcNow;
 

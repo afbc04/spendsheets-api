@@ -33,11 +33,11 @@ namespace DTO {
         // @@@@@@@@@@@@@@@@
         public void set_username(string username) {
 
-            if (username.Length < Config.username_length_min)
-                throw new ConfigDTOException($"Username is too short (less than {Config.username_length_min} characters)");
+            if (username.Length < ConfigRules.username_length_min)
+                throw new ConfigDTOException($"Username is too short (less than {ConfigRules.username_length_min} characters)");
 
-            if (username.Length >= Config.username_length_max)
-                throw new ConfigDTOException($"Username is too long (more than {Config.username_length_max} characters)");
+            if (username.Length >= ConfigRules.username_length_max)
+                throw new ConfigDTOException($"Username is too long (more than {ConfigRules.username_length_max} characters)");
 
             this._config.username = username;
 
@@ -45,20 +45,20 @@ namespace DTO {
 
         public void set_password(string password) {
 
-            if (password.Length < Config.password_length_min)
-                throw new ConfigDTOException($"Password is too short (less than {Config.password_length_min} characters)");
+            if (password.Length < ConfigRules.password_length_min)
+                throw new ConfigDTOException($"Password is too short (less than {ConfigRules.password_length_min} characters)");
 
-            if (password.Length >= Config.password_length_max)
-                throw new ConfigDTOException($"Password is too long (more than {Config.password_length_max} characters)");
+            if (password.Length >= ConfigRules.password_length_max)
+                throw new ConfigDTOException($"Password is too long (more than {ConfigRules.password_length_max} characters)");
 
             this._config.set_password(password);
 
         }
 
-        public void set_name(string name) {
+        public void set_name(string? name) {
 
-            if (name.Length >= Config.name_length_max)
-                throw new ConfigDTOException($"Name is too long (more than {Config.name_length_max} characters)");
+            if (name != null && name.Length >= ConfigRules.name_length_max)
+                throw new ConfigDTOException($"Name is too long (more than {ConfigRules.name_length_max} characters)");
 
             this._config.name = name;
 

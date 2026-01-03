@@ -2,14 +2,6 @@ using System.Security.Cryptography;
 
 public class Config {
 
-    // Rules applied to Config
-    public static readonly int username_length_min = 3;
-    public static readonly int username_length_max = 30;
-    public static readonly int password_length_min = 4;
-    public static readonly int password_length_max = 64;
-    public static readonly int name_length_max = 64;
-
-    // Proprieties of Config
     public int database_version {set; get;}
     public DateTime last_online_date {set; get;}
 
@@ -20,14 +12,14 @@ public class Config {
 
     public string? name {set; get;}
     public bool is_visible_to_public {set; get;}
-    public ulong initial_money {set; get;}
-    public ulong lost_money {set; get;}
-    public ulong saved_money {set; get;}
+    public long initial_money {set; get;}
+    public long lost_money {set; get;}
+    public long saved_money {set; get;}
 
     // Constructors
     public Config(string username, byte[] password) {
 
-        this.database_version = Models.ModelsManager.database_version;
+        this.database_version = DAO.DAOManager.database_version;
         this.last_online_date = DateTime.UtcNow;
 
         this.username = username;
@@ -42,7 +34,7 @@ public class Config {
 
     }
 
-    public Config(int database_version, DateTime last_online_date, string username, byte[] password, byte[] salt, string? name, bool is_visible_to_public, ulong initial_money, ulong lost_money, ulong saved_money) {
+    public Config(int database_version, DateTime last_online_date, string username, byte[] password, byte[] salt, string? name, bool is_visible_to_public, long initial_money, long lost_money, long saved_money) {
 
         this.database_version = database_version;
         this.last_online_date = last_online_date;

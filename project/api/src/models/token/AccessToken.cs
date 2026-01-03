@@ -10,4 +10,8 @@ public class AccessToken {
 
     }
 
+    public static bool IsValid(AccessToken? token) {
+        return token != null && token.is_valid == true;
+    }
+
 }

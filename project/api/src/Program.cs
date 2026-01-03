@@ -5,15 +5,14 @@ public class Program {
 
     public static async Task Main(string[] args) {
 
-        if (await API.init() == true) {
+        if (await API.StartAPI() == true) {
 
             Log.Information("API was successfully started");
 
             var builder = WebApplication.CreateBuilder(args);
-            builder.WebHost.UseUrls("http://*:25000");
-
             var app = builder.Build();
-            app.Use(ProgramHandler.log_requests);
+
+            app.Use(ProgramHandler.LogRequests);
             v1Routers.Register(app);
             DocsRouter.Register(app);
 

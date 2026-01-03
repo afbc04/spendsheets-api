@@ -4,6 +4,6 @@ WORKDIR /api
 COPY *.csproj .
 COPY *.json .
 
-EXPOSE 25000
+EXPOSE 8080
 
-ENTRYPOINT ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:25000"]
+ENTRYPOINT ["dotnet", "watch", "run"]

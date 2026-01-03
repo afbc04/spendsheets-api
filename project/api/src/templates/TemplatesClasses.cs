@@ -3,16 +3,18 @@ namespace PacketTemplates {
     public abstract class TemplateValidatorField {
         public bool is_required { get; set; }
         public bool is_list { get; set; }
+        public bool allow_null { get; set; }
     }
 
     public class TemplateValidatorItem : TemplateValidatorField {
 
         public Type datatype { get; set; }
 
-        public TemplateValidatorItem(bool is_required, Type datatype, bool is_list) {
+        public TemplateValidatorItem(bool is_required, Type datatype, bool is_list, bool allow_null) {
             this.is_required = is_required;
             this.datatype = datatype;
             this.is_list = is_list;
+            this.allow_null = allow_null;
         }
     }
 
@@ -20,9 +22,10 @@ namespace PacketTemplates {
 
         public Dictionary<string, TemplateValidatorField> obj { get; set; }
 
-        public TemplateValidatorObject(bool is_required, bool is_list) {
+        public TemplateValidatorObject(bool is_required, bool is_list, bool allow_null) {
             this.is_required = is_required;
             this.is_list = is_list;
+            this.allow_null = allow_null;
             this.obj = new();
         }
 

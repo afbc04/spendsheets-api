@@ -1,44 +1,42 @@
 using PacketHandlers;
-using Models;
 using Nito.AsyncEx;
-using Queries;
-using Pages;
-using DTO;
 
 namespace Controller {
 
     public class TokenController {
 
         public readonly AsyncReaderWriterLock Lock;
-        private Token? _token;
+        private volatile Token? token;
 
         public TokenController() {
             this.Lock = new();
-            this._token = null;
+            this.token = null;
         }
 
-        public AccessToken? get_token(string token) {
+        // @@@@@@@@@@@@@@@@@@@@@@@@@
+        //  Auxiliar Funcionalities
+        // @@@@@@@@@@@@@@@@@@@@@@@@@
+        public AccessToken? _GetToken(string? token) {
 
-            if (this._token == null)
+            if (this.token == null || token == null)
                 return null;
 
-            return this._token.token == token ? this._token.get_access_token() : null;
+            return this.token.token == token ? this.token.get_access_token() : null;
 
         }
 
-        public static SendingPacket send_error_token_not_valid() {
-            return new PacketFail(401,"Token is not valid or expired");
-        }
-
+        // @@@@@@@@@@@@@@@@@@@@@@@@@
+        //    Main Funcionalities
+        // @@@@@@@@@@@@@@@@@@@@@@@@@
         public SendingPacket Get() {
 
-            if (Token.is_valid(this._token) == false)
-                return new PacketSuccess(404,new Dictionary<string,object?> {
-                    ["valid"] = false,
-                    ["writer"] = null
-                });
-            else
-                return new PacketSuccess(200,this._token!.to_json_details());
+            bool valid = Token.is_valid(this.token);
+            bool? writer = valid == true ? this.token!.is_writer : null;
+
+            return new PacketSuccess(valid ? 200 : 401, new Dictionary<string,object?> {
+                ["valid"] = valid,
+                ["writer"] = writer
+            });
 
         }
 
@@ -47,28 +45,27 @@ namespace Controller {
             if (config.username != (string) token_data["username"] || config.verify_password((string) token_data["password"]) == false)
                 return new PacketFail(403,"Username or password does not match up to configuration of system");
 
-            this._token = new Token(true);
-            return new PacketSuccess(201,this._token.to_json_created());
+            this.token = new Token((bool) token_data["writer"]);
+            return new PacketSuccess(201,this.token.to_json());
 
         }
 
         public SendingPacket Delete(AccessToken? token) {
         
             if (token == null)
-                return new PacketFail(403,"Token is not valid. Can not remove this token");
-            else {
-                this._token = null;
-                return new PacketSuccess(200,new Dictionary<string,object>{
-                    ["message"] = "Token was deleted"
-                });
-            }
+                return SendErrors.InvalidToken();
+            
+            this.token = null;
+            return new PacketSuccess(200,new Dictionary<string,object>{
+                ["message"] = "Token was deleted"
+            });
 
         }
 
         public SendingPacket Update(IDictionary<string,object> token_data, AccessToken? token, Config config) {
 
-            if (token == null || token.is_valid == false)
-                return TokenController.send_error_token_not_valid();
+            if (AccessToken.IsValid(token) == false)
+                return SendErrors.InvalidToken(token);
 
             bool is_writer = (bool) token_data["writer"];
 
@@ -80,7 +77,7 @@ namespace Controller {
                     if (config.username != (string) token_data["username"] || config.verify_password((string) token_data["password"]) == false)
                         return new PacketFail(403,"Username or password does not match up to configuration of system. Could not switch to writer mode!");
                     else
-                        this._token!.is_writer = true;
+                        this.token!.is_writer = true;
 
                 }
                 else
@@ -89,7 +86,7 @@ namespace Controller {
             }
             // Switch to reader mode
             else {
-                this._token!.is_writer = false;
+                this.token!.is_writer = false;
             }
 
             return new PacketSuccess(200,new Dictionary<string,object?> {

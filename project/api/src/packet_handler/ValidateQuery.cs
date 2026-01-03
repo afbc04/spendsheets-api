@@ -1,9 +1,24 @@
 using System.Text.RegularExpressions;
 using PacketTemplates;
 using Queries;
-using Pages;
 
 namespace PacketHandlers {
+
+    public class PacketQueryValidatorPage {
+
+        public long page;
+        public long limit;
+        public IList<QueryOrderItem> sort {get; private set;}
+
+        public PacketQueryValidatorPage(long page, long limit, IList<QueryOrderItem> sort) {
+
+            this.page = page;
+            this.limit = limit;
+            this.sort = sort;
+
+        }
+
+    }
 
     public class PacketQueryValidatorObject {
 
@@ -27,7 +42,7 @@ namespace PacketHandlers {
 
     public static class PacketQueryValidatorFunctions {
 
-        public static (PacketQueryValidatorObject,Querieable?) validate_packet_query_fields(Dictionary<string, object> data, TemplateValidatorQuery requirements) {
+        public static (PacketQueryValidatorObject,QueriesRequest?) validate_packet_query_fields(Dictionary<string, object> data, TemplateValidatorQuery requirements) {
             
             var pqv = new PacketQueryValidatorObject();
 
@@ -46,14 +61,14 @@ namespace PacketHandlers {
                 
             }
 
-            PageInput? page_input = null;
+            PacketQueryValidatorPage? page = null;
 
             if (pqv.wrong_datatype_fields.Count() == 0) {
-                (page_input, List<string> page_error_format) = validate_packet_query_fields_page(data,requirements.has_page,requirements.sort_opts);
+                (page, List<string> page_error_format) = validate_packet_query_fields_page(data,requirements.has_page,requirements.sort_opts);
                 pqv.wrong_page_format = page_error_format;
             }
 
-            var queriable = new Querieable(page_input,data!);
+            var queriable = page == null ? new QueriesRequest(null,null,[],data!) : new QueriesRequest(page.page,page.limit,page.sort,data!);
             return (pqv,queriable);
 
         }
@@ -62,59 +77,59 @@ namespace PacketHandlers {
 
             if (requirements.datatype == typeof(double)) {
 
-                if (Regex.IsMatch((string) item,@"^-?\d+(\.\d+)?$") == false)
-                    pqv.wrong_datatype_fields[key] = requirements.datatype.Name;
+                if (Regex.IsMatch((string) item,@"^-?\d+\.\d+$") == false)
+                    pqv.wrong_datatype_fields[key] = PacketUtils.getType(requirements.datatype);
 
             }
             else if (requirements.datatype == typeof(long)) {
 
                 if (Regex.IsMatch((string) item,@"^-?\d+$") == false)
-                    pqv.wrong_datatype_fields[key] = requirements.datatype.Name;
+                    pqv.wrong_datatype_fields[key] = PacketUtils.getType(requirements.datatype);
 
             }
             else if (requirements.datatype == typeof(bool)) {
 
                 if (Regex.IsMatch((string) item,@"^(true|false)$") == false)
-                    pqv.wrong_datatype_fields[key] = requirements.datatype.Name;
+                    pqv.wrong_datatype_fields[key] = PacketUtils.getType(requirements.datatype);
 
             }
             else if (requirements.datatype == typeof(string)) {
 
-                if (Regex.IsMatch((string) item,@"^[\w%_\d{} :\.\-]+$") == false)
-                    pqv.wrong_datatype_fields[key] = requirements.datatype.Name;
+                if (Regex.IsMatch((string) item,@"^[\w%_\d{} :\.\-,]+$") == false)
+                    pqv.wrong_datatype_fields[key] = PacketUtils.getType(requirements.datatype);
 
             }
             else {
-                pqv.wrong_datatype_fields[key] = requirements.datatype.Name;
+                pqv.wrong_datatype_fields[key] = PacketUtils.getType(requirements.datatype);
             }
             
             return pqv;
 
         }
 
-        private static (PageInput?,List<string>) validate_packet_query_fields_page(Dictionary<string, object> data, bool has_pageable, HashSet<string> sort_opts) {
+        private static (PacketQueryValidatorPage?,List<string>) validate_packet_query_fields_page(Dictionary<string, object> data, bool has_pageable, HashSet<string> sort_opts) {
             
             var error_list = new List<string>();
 
             if (has_pageable == false)
                 return (null,error_list);
 
-            var page = Convert.ToInt64(PacketUtils.get_value(data,"page") ?? 1);
-            var limit = Convert.ToInt64(PacketUtils.get_value(data,"limit") ?? 10);
+            var page = Convert.ToInt64(PacketUtils.get_value(data,"page") ?? PageRules.page_default);
+            var limit = Convert.ToInt64(PacketUtils.get_value(data,"limit") ?? PageRules.limit_default);
             var sort = (string?) PacketUtils.get_value(data,"sort");
 
             if (page <= 0)
                 error_list.Add("Page number must be a positive number");
 
-            if (limit <= 0) {
-                error_list.Add("Limit must be a positive number");
+            if (limit < PageRules.limit_min) {
+                error_list.Add($"Limit is too low. Minimum is {PageRules.limit_min}");
             }
 
-            if (limit > 100) {
-                error_list.Add("Limit is too high. Maximum is 100");
+            if (limit > PageRules.limit_max) {
+                error_list.Add($"Limit is too high. Maximum is {PageRules.limit_max}");
             }
 
-            List<(string,bool)> sort_list = new();
+            List<QueryOrderItem> sort_list = new();
 
             if (sort != null) {
 
@@ -133,7 +148,7 @@ namespace PacketHandlers {
                         if (sort_opts.Contains(token_args[0].ToLower()) == false) 
                             error_list.Add($"Sort argument {token_args[0]} is not valid. Try these ones : [{sort_options}]");
                         else 
-                            sort_list.Add((token_args[0],is_asc));
+                            sort_list.Add(new QueryOrderItem(token_args[0],is_asc));
 
                     }
 
@@ -144,8 +159,8 @@ namespace PacketHandlers {
             if (error_list.Count() > 0)
                 return (null,error_list);
             else {
-                PageInput page_input = new PageInput((long) page!,(long) limit!,sort_list);
-                return (page_input,error_list);
+                PacketQueryValidatorPage page_obj = new PacketQueryValidatorPage((long) page!,(long) limit!,sort_list);
+                return (page_obj,error_list);
             }
 
         }

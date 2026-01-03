@@ -12,9 +12,9 @@ namespace PacketHandlers {
 
         public string? token {get;}
         public IDictionary<string,object>? body {get;}
-        public Querieable? queries {get;}
+        public QueriesRequest? queries {get;}
 
-        public PacketExtracted(string? token, IDictionary<string,object>? body, Querieable? queries) {
+        public PacketExtracted(string? token, IDictionary<string,object>? body, QueriesRequest? queries) {
             this.token = token;
             this.body = body;
             this.queries = queries;

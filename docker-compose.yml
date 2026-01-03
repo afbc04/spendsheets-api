@@ -6,9 +6,7 @@ services:
     volumes:
       - ./project/api/src:/api/src
     ports:
-      - "${API_PORT}:25000"
-    environment:
-      - PYTHONUNBUFFERED=1 # Avoid duplication in writes on STDOUT
+      - "${API_PORT}:8080"
     env_file:
       - .env
     tty: true

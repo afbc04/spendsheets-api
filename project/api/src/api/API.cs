@@ -1,21 +1,24 @@
 using Controller;
 using Serilog;
-using Models;
+using DAO;
 using System.Threading.Tasks;
 
 public class API {
 
-    public static ControllerManager? controller {get; private set;} = null;
+    public static Manager? _manager {get; private set;}
 
-    public static async Task<bool> init() {
+    public static Manager GetAPI() {
+        return API._manager!;
+    }
+
+    public static async Task<bool> StartAPI() {
 
         try {
 
-            ProgramHandler.start_logger();
-            PacketTemplates.TemplateLoader.load_templates();
-            await ModelsManager.init();
-            API.controller = new();
-            await API.controller.load_settings();
+            ProgramHandler.StartLogger();
+            PacketTemplates.TemplateLoader.LoadTemplates();
+            await DAOManager.StartDatabase();
+            API._manager = await Manager.Start();
 
             return true;
 

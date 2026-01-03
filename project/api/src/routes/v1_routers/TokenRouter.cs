@@ -8,12 +8,13 @@ public static class TokenRouters {
     public static RouteGroupBuilder TokenRoutersMapping(this RouteGroupBuilder group) {
 
         var app = group.MapGroup("/token").AllowAnonymous();
+        var api = API.GetAPI();
 
         // GET /v1.0/token
         app.MapGet("", async (HttpRequest request) => {
 
             return await PacketUtils.validate_and_reply(request, "token/get", async (packet) => {
-                return PacketUtils.send_packet(await API.controller!.token_get());
+                return PacketUtils.send_packet(await api.Token.Get());
             });
 
         });
@@ -22,7 +23,7 @@ public static class TokenRouters {
         app.MapPost("", async (HttpRequest request) => {
 
             return await PacketUtils.validate_and_reply(request, "token/create", async (packet) => {
-                return PacketUtils.send_packet(await API.controller!.token_create(packet.body!));
+                return PacketUtils.send_packet(await api.Token.Create(packet.body!));
             });
 
         });
@@ -31,7 +32,7 @@ public static class TokenRouters {
         app.MapDelete("", async (HttpRequest request) => {
 
             return await PacketUtils.validate_and_reply(request, "token/delete", async (packet) => {
-                return PacketUtils.send_packet(await API.controller!.token_delete(packet.token!));
+                return PacketUtils.send_packet(await api.Token.Delete(packet.token!));
             });
 
         });
@@ -40,7 +41,7 @@ public static class TokenRouters {
         app.MapPut("", async (HttpRequest request) => {
 
             return await PacketUtils.validate_and_reply(request, "token/update", async (packet) => {
-                return PacketUtils.send_packet(await API.controller!.token_update(packet.body!,packet.token!));
+                return PacketUtils.send_packet(await api.Token.Update(packet.body!,packet.token!));
             });
 
         });

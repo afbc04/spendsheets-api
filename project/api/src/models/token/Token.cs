@@ -5,7 +5,7 @@ public class Token {
     public bool is_writer {set; get;}
     public string token {private set; get;}
     public DateTime _expiration_time {private set; get;}
-    private static readonly int minutes_until_expires = 1;
+    private static readonly int minutes_until_expires = 15;
 
     public IDictionary<string,object?> to_json_details() {
         return new Dictionary<string,object?> {
@@ -14,7 +14,7 @@ public class Token {
         };
     }
 
-    public IDictionary<string,object?> to_json_created() {
+    public IDictionary<string,object?> to_json() {
         return new Dictionary<string,object?> {
             ["accessToken"] = this.token,
             ["tokenType"] = "Bearer",

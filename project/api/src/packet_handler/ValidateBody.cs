@@ -94,8 +94,8 @@ namespace PacketHandlers {
 
         private static PacketBodyValidatorObject _validate_packet_body_fields_rec_value_item(object item, TemplateValidatorItem requirements, string path, PacketBodyValidatorObject pbv) {
 
-            if (item == null || requirements.datatype != item.GetType())
-                pbv.wrong_datatype_fields[path] = requirements.datatype.Name;
+            if ((item == null && requirements.allow_null == false) || (item != null && requirements.datatype != item.GetType()))
+                pbv.wrong_datatype_fields[path] = string.Concat(PacketUtils.getType(requirements.datatype),requirements.allow_null ? " | null" : "");
             
             return pbv;
 
@@ -103,13 +103,19 @@ namespace PacketHandlers {
 
         private static PacketBodyValidatorObject _validate_packet_body_fields_rec_value_object(object obj, TemplateValidatorObject requirements, string path, PacketBodyValidatorObject pbv) {
             
-            if (obj is not Dictionary<string, object>)
-                pbv.wrong_datatype_fields[path] = "object";
-            
-            else {
-                var pbv_from_object = validate_packet_body_fields_rec((Dictionary<string, object>) obj, requirements.obj, $"{path}.");
-                pbv.merge_with(pbv_from_object);
+            if (obj != null) {
+
+                if (obj is not Dictionary<string, object>)
+                    pbv.wrong_datatype_fields[path] = string.Concat("object",requirements.allow_null ? " | null" : "");
+                
+                else {
+                    var pbv_from_object = validate_packet_body_fields_rec((Dictionary<string, object>) obj, requirements.obj, $"{path}.");
+                    pbv.merge_with(pbv_from_object);
+                }
+
             }
+            else if (obj == null & requirements.allow_null == false)
+                pbv.wrong_datatype_fields[path] = "object";
 
             return pbv;
         }   

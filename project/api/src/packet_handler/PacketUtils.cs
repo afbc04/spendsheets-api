@@ -70,6 +70,19 @@ namespace PacketHandlers {
             return string.IsNullOrWhiteSpace(value) ? null : value;
         }
 
+        public static string getType(Type type) {
+
+            return Type.GetTypeCode(type) switch {
+                TypeCode.Int64   => "integer",
+                TypeCode.Double  => "float",
+                TypeCode.Boolean => "boolean",
+                TypeCode.String  => "string",
+                _                => "any"
+            };
+            
+        }
+
+
     }
 
 }

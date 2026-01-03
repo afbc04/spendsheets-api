@@ -119,7 +119,7 @@ namespace PacketHandlers {
 
         }
 
-        public static Querieable validate_packet_queries(HttpRequest request, TemplateValidatorQuery? queries) {
+        public static QueriesRequest validate_packet_queries(HttpRequest request, TemplateValidatorQuery? queries) {
 
             var data = request.Query.ToDictionary(
                 kv => kv.Key,
@@ -131,7 +131,7 @@ namespace PacketHandlers {
                 if (data.Count > 0)
                     throw new ValidatePacketException(417, "This endpoint doesn't accept query parameters. Do not send them.");
 
-                return new Querieable(null,new Dictionary<string,object?>());
+                return new QueriesRequest(null,null,[],new Dictionary<string,object?>());
 
             }
 
@@ -139,7 +139,7 @@ namespace PacketHandlers {
 
         }
 
-        private static Querieable _validate_packet_queries_fields(Dictionary<string, object> data, TemplateValidatorQuery requirements) {
+        private static QueriesRequest _validate_packet_queries_fields(Dictionary<string, object> data, TemplateValidatorQuery requirements) {
 
             (var pqv, var queries_final) = PacketQueryValidatorFunctions.validate_packet_query_fields(data, requirements);
 
@@ -150,7 +150,7 @@ namespace PacketHandlers {
                 throw new ValidatePacketException(417, "There are some extra query parameters. Please remove them", new Dictionary<string,object> { { "extra_values", pqv.unnecessary_fields } });
 
             if (pqv.wrong_page_format.Count > 0)
-                throw new ValidatePacketException(417, "There are some page parameters with wrong datatype. Please correct them", new Dictionary<string,object> { { "page_errors", pqv.wrong_page_format } });
+                throw new ValidatePacketException(417, "There are some page parameters with wrong format. Please correct them", new Dictionary<string,object> { { "page_errors", pqv.wrong_page_format } });
 
             return queries_final!;
 
@@ -167,7 +167,7 @@ namespace PacketHandlers {
                 }
 
                 IDictionary<string,object>? extracted_body = null;
-                Querieable? extracted_queries = null;
+                QueriesRequest? extracted_queries = null;
 
                 string? token = validate_packet_auth(request, template.auth);
                 extracted_body = await validate_packet_body(request, template.body);
