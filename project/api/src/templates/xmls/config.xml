@@ -16,7 +16,20 @@
         </body>
     </template>
 
-    <template id="update">
+    <template id="update-full">
+        <auth required="true"/>
+        <body required="true">
+            <i name="username" required="true"/>
+            <i name="password" required="true"/>
+            <i name="name" null="true"/>
+            <i name="public" datatype="bool" />
+            <i name="initialMoney" datatype="float" />
+            <i name="lostMoney" datatype="float" />
+            <i name="savedMoney" datatype="float" />
+        </body>
+    </template>
+
+    <template id="update-partial">
         <auth required="true"/>
         <body required="true">
             <i name="username"/>
@@ -27,6 +40,10 @@
             <i name="lostMoney" datatype="float" />
             <i name="savedMoney" datatype="float" />
         </body>
+    </template>
+
+    <template id="delete">
+        <auth required="true"/>
     </template>
 
 </templates>

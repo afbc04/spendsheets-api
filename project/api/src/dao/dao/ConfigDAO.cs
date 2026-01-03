@@ -54,6 +54,18 @@ namespace DAO {
 
         }
 
+        public async Task<bool> Delete() {
+
+            const string sql = "DELETE FROM Config WHERE id = 0";
+            return await DAOUtils.Query(sql, async cmd => {
+
+                var lines = await cmd.ExecuteNonQueryAsync();
+                return lines > 0;
+
+            });
+
+        }
+
         public async Task<bool> Put(Config config) {
 
             try {

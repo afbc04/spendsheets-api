@@ -41,12 +41,12 @@ public class TokenManager {
 
     }
 
-    public async Task<SendingPacket> Update(IDictionary<string,object> request_data, string token_extracted) {
+    public async Task<SendingPacket> Patch(IDictionary<string,object> request_data, string token_extracted) {
 
         using (await config.Lock.ReaderLockAsync())
             return await ManagerHelper.CheckConfig(config, async () => {
                 using (await token.Lock.WriterLockAsync())
-                    return token.Update(request_data,token._GetToken(token_extracted),config.config!);
+                    return token.Patch(request_data,token._GetToken(token_extracted),config.config!);
             });
 
     }

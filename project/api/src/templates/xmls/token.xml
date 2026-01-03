@@ -13,7 +13,7 @@
         </body>
     </template>
 
-    <template id="update">
+    <template id="patch">
         <auth required="true"/>
         <body required="true">
             <i name="username"/>

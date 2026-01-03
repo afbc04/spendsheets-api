@@ -27,12 +27,37 @@ public class ConfigManager {
 
     }
 
+    public async Task<SendingPacket> Patch(IDictionary<string,object> request_data, string? extracted_token) {
+
+        using (await config.Lock.WriterLockAsync())
+        using (await token.Lock.ReaderLockAsync())
+            return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) =>
+                await config.Patch(request_data)
+            );
+
+    }
+
     public async Task<SendingPacket> Update(IDictionary<string,object> request_data, string? extracted_token) {
 
         using (await config.Lock.WriterLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) =>
                 await config.Update(request_data)
+            );
+
+    }
+
+    public async Task<SendingPacket> Delete(string? extracted_token) {
+
+        using (await config.Lock.WriterLockAsync())
+        using (await token.Lock.ReaderLockAsync())
+            return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
+                
+                var packet = await config.Delete();
+                token._DeleteToken();
+                return packet;
+
+                }
             );
 
     }

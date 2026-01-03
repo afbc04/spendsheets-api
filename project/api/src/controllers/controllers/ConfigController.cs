@@ -113,7 +113,41 @@ namespace Controller {
 
         public async Task<SendingPacket> Update(IDictionary<string,object> config_data) {
 
-            if (!this._ConfigExists())
+            if (this._ConfigExists() == false)
+                return SendErrors.ConfigNotExists();
+
+            try {
+
+                var config_dto = new ConfigDTO();
+
+                config_dto.set_username((string) config_data["username"]);
+                config_dto.set_password((string) config_data["password"]);
+
+                if (config_data.ContainsKey("name")) config_dto.set_name((string?) config_data["name"]);
+                if (config_data.ContainsKey("public")) config_dto.set_public((bool) config_data["public"]);
+                if (config_data.ContainsKey("initialMoney")) config_dto.set_initial_money((double) config_data["initialMoney"]);
+                if (config_data.ContainsKey("lostMoney")) config_dto.set_lost_money((double) config_data["lostMoney"]);
+                if (config_data.ContainsKey("savedMoney")) config_dto.set_saved_money((double) config_data["savedMoney"]);
+
+                var updated_config = config_dto.extract();
+
+                if (await this.dao.Put(updated_config)) {
+                    this.config = updated_config;
+                    return new PacketSuccess(200,updated_config.to_json());
+                }
+                else
+                    return new PacketFail(422,"Error while updating config of database");
+
+            }
+            catch (ConfigDTOException ex) {
+                return new PacketFail(417,ex.message);
+            }
+
+        }
+
+        public async Task<SendingPacket> Patch(IDictionary<string,object> config_data) {
+
+            if (this._ConfigExists() == false)
                 return SendErrors.ConfigNotExists();
 
             try {
@@ -142,6 +176,21 @@ namespace Controller {
             catch (ConfigDTOException ex) {
                 return new PacketFail(417,ex.message);
             }
+
+        }
+
+        public async Task<SendingPacket> Delete() {
+
+            if (this._ConfigExists() == false)
+                return SendErrors.ConfigNotExists();
+
+            if (await this.dao.Delete()) {
+                Config? deleted_config = this.config;
+                this.config = null;
+                return new PacketSuccess(200,deleted_config!.to_json());
+            }
+            else
+                return new PacketFail(422,"Error while deleting config from database");
 
         }
 

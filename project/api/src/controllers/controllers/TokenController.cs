@@ -25,6 +25,10 @@ namespace Controller {
 
         }
 
+        public void _DeleteToken() {
+            this.token = null;
+        }
+
         // @@@@@@@@@@@@@@@@@@@@@@@@@
         //    Main Funcionalities
         // @@@@@@@@@@@@@@@@@@@@@@@@@
@@ -62,7 +66,7 @@ namespace Controller {
 
         }
 
-        public SendingPacket Update(IDictionary<string,object> token_data, AccessToken? token, Config config) {
+        public SendingPacket Patch(IDictionary<string,object> token_data, AccessToken? token, Config config) {
 
             if (AccessToken.IsValid(token) == false)
                 return SendErrors.InvalidToken(token);

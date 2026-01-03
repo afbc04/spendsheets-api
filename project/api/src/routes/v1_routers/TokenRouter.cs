@@ -37,11 +37,11 @@ public static class TokenRouters {
 
         });
 
-        // PUT /v1.0/token
-        app.MapPut("", async (HttpRequest request) => {
+        // PATCH /v1.0/token
+        app.MapPatch("", async (HttpRequest request) => {
 
-            return await PacketUtils.validate_and_reply(request, "token/update", async (packet) => {
-                return PacketUtils.send_packet(await api.Token.Update(packet.body!,packet.token!));
+            return await PacketUtils.validate_and_reply(request, "token/patch", async (packet) => {
+                return PacketUtils.send_packet(await api.Token.Patch(packet.body!,packet.token!));
             });
 
         });
