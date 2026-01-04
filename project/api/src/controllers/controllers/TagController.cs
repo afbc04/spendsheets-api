@@ -45,6 +45,16 @@ namespace Controller {
 
         }
 
+        public async Task<SendingPacket> Clear() {
+
+            long tags_deleted = await this.dao.Clear();
+            return new PacketSuccess(200,new Dictionary<string,object> {
+                ["tagsDeleted"] = tags_deleted,
+                ["deleted"] = tags_deleted > 0
+            });
+
+        }
+
         public async Task<SendingPacket> Create(IDictionary<string,object> tag_data) {
 
             try {
@@ -94,6 +104,41 @@ namespace Controller {
         }
 
         public async Task<SendingPacket> Update(IDictionary<string,object> tag_data, string _id) {
+
+            return await ControllerHelper.IDIsNumber(_id, async (id) => {
+
+                Tag? tag = await this.dao.Get(id);
+                
+                if (tag == null)
+                    return new PacketFail(404);
+                else {
+                    
+                    try {
+
+                        var tag_dto = new TagDTO(id);
+
+                        tag_dto.set_name((string) tag_data["name"]);
+                        if (tag_data.ContainsKey("description")) tag_dto.set_description((string?) tag_data["description"]);
+
+                        var updated_tag = tag_dto.extract();
+
+                        if (await this.dao.Update(updated_tag))
+                            return new PacketSuccess(200,updated_tag.to_json());
+                        else
+                            return new PacketFail(422,"Error while updating tag of database");
+
+                    }
+                    catch (TagDTOException ex) {
+                        return new PacketFail(417,ex.message);
+                    }
+
+                }
+
+            });
+
+        }
+
+        public async Task<SendingPacket> Patch(IDictionary<string,object> tag_data, string _id) {
 
             return await ControllerHelper.IDIsNumber(_id, async (id) => {
 

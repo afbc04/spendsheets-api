@@ -19,6 +19,10 @@ namespace DTO {
             this._tag = new Tag(0,"");
         }
 
+        public TagDTO(long ID) {
+            this._tag = new Tag(ID,"");
+        }
+
         public TagDTO(Tag tag) {
             this._tag = tag;
         }

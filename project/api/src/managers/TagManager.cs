@@ -25,6 +25,17 @@ public class TagManager {
         
     }
 
+    public async Task<SendingPacket> Clear(string? extracted_token) {
+        
+        using (await config.Lock.ReaderLockAsync())
+        using (await token.Lock.ReaderLockAsync())
+            return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
+                using (await tag.Lock.WriterLockAsync())
+                    return await tag.Clear();
+            });
+        
+    }
+
     public async Task<SendingPacket> Create(string extracted_token, IDictionary<string,object> request_data) {
 
         using (await config.Lock.ReaderLockAsync())
@@ -54,6 +65,17 @@ public class TagManager {
             return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
                 using (await tag.Lock.WriterLockAsync())
                     return await tag.Delete(id);
+            });
+
+    }
+
+    public async Task<SendingPacket> Patch(IDictionary<string,object> request_data, string extracted_token, string id) {
+
+        using (await config.Lock.ReaderLockAsync())
+        using (await token.Lock.ReaderLockAsync())
+            return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
+                using (await tag.Lock.WriterLockAsync())
+                    return await tag.Patch(request_data,id);
             });
 
     }

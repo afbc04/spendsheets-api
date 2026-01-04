@@ -66,6 +66,19 @@ namespace DAO {
 
         }
 
+        public async Task<long> Clear() {
+
+            const string sql = "DELETE FROM Tags;";
+            return await DAOUtils.Query(sql, async cmd => {
+
+                var affected = await cmd.ExecuteNonQueryAsync();
+                return affected;
+
+            });
+            
+        }
+
+
         public async Task<long?> Create(Tag tag) {
 
             try {

@@ -27,6 +27,15 @@ public static class TagRouters {
 
         });
 
+        // DELETE /v1.0/tags
+        app.MapDelete("", async (HttpRequest request) => {
+
+            return await PacketUtils.validate_and_reply(request, "tag/clear", async (packet) => {
+                return PacketUtils.send_packet(await api.Tag.Clear(packet.token!));
+            });
+
+        });
+
         // GET /v1.0/tags/:id
         app.MapGet("{id}", async (HttpRequest request, string id) => {
 
@@ -45,10 +54,19 @@ public static class TagRouters {
 
         });
 
+        // PATCH /v1.0/tags/:id
+        app.MapPatch("{id}", async (HttpRequest request, string id) => {
+
+            return await PacketUtils.validate_and_reply(request, "tag/update-partial", async (packet) => {
+                return PacketUtils.send_packet(await api.Tag.Patch(packet.body!,packet.token!,id));
+            });
+
+        });
+
         // PUT /v1.0/tags/:id
         app.MapPut("{id}", async (HttpRequest request, string id) => {
 
-            return await PacketUtils.validate_and_reply(request, "tag/update", async (packet) => {
+            return await PacketUtils.validate_and_reply(request, "tag/update-full", async (packet) => {
                 return PacketUtils.send_packet(await api.Tag.Update(packet.body!,packet.token!,id));
             });
 
