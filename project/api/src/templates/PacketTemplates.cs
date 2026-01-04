@@ -105,9 +105,9 @@ namespace PacketTemplates {
                 bool is_list = (item.Attribute("list")?.Value ?? "FALSE").ToUpper() == "TRUE";
 
                 Type datatype = (item.Attribute("datatype")?.Value ?? "string").ToLower() switch {
-                    "int" => typeof(long),
+                    "integer" => typeof(long),
                     "float" => typeof(double),
-                    "bool" => typeof(bool),
+                    "boolean" => typeof(bool),
                     _ => typeof(string)
                 };
 
@@ -174,7 +174,7 @@ namespace PacketTemplates {
                 Type datatype = (item.Attribute("datatype")?.Value ?? "string").ToLower() switch {
                     "integer" => typeof(long),
                     "float" => typeof(double),
-                    "bool" => typeof(bool),
+                    "boolean" => typeof(bool),
                     _ => typeof(string)
                 };
 

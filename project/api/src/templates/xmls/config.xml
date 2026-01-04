@@ -9,7 +9,7 @@
             <i name="username" required="true"/>
             <i name="password" required="true"/>
             <i name="name" null="true"/>
-            <i name="public" datatype="bool" />
+            <i name="public" datatype="boolean" />
             <i name="initialMoney" datatype="float" />
             <i name="lostMoney" datatype="float" />
             <i name="savedMoney" datatype="float" />
@@ -22,7 +22,7 @@
             <i name="username" required="true"/>
             <i name="password" required="true"/>
             <i name="name" null="true"/>
-            <i name="public" datatype="bool" />
+            <i name="public" datatype="boolean" />
             <i name="initialMoney" datatype="float" />
             <i name="lostMoney" datatype="float" />
             <i name="savedMoney" datatype="float" />
@@ -35,7 +35,7 @@
             <i name="username"/>
             <i name="password"/>
             <i name="name" null="true"/>
-            <i name="public" datatype="bool" />
+            <i name="public" datatype="boolean" />
             <i name="initialMoney" datatype="float" />
             <i name="lostMoney" datatype="float" />
             <i name="savedMoney" datatype="float" />

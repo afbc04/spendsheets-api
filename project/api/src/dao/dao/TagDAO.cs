@@ -66,18 +66,31 @@ namespace DAO {
 
         }
 
-        public async Task<long> Clear() {
+        public async Task<long> ClearAll() {
 
             const string sql = "DELETE FROM Tags;";
             return await DAOUtils.Query(sql, async cmd => {
 
-                var affected = await cmd.ExecuteNonQueryAsync();
-                return affected;
+                var deleted_rows_count = await cmd.ExecuteNonQueryAsync();
+                return deleted_rows_count;
 
             });
             
         }
 
+        public async Task<long> ClearSome(IList<long> list_of_ids) {
+
+            const string sql = @"DELETE FROM Tags WHERE id = ANY(@ids);";
+            return await DAOUtils.Query(sql, async cmd => {
+
+                cmd.Parameters.AddWithValue("@ids", list_of_ids.ToArray());
+
+                var deleted_rows_count = await cmd.ExecuteNonQueryAsync();
+                return deleted_rows_count;
+
+            });
+            
+        }
 
         public async Task<long?> Create(Tag tag) {
 

@@ -45,9 +45,28 @@ namespace Controller {
 
         }
 
-        public async Task<SendingPacket> Clear() {
+        public async Task<SendingPacket> Clear(IDictionary<string,object> clearing_instructions) {
 
-            long tags_deleted = await this.dao.Clear();
+            bool clear_all = (bool) clearing_instructions["clearAll"];
+            long tags_deleted;
+
+            if (clear_all == false) {
+
+                if (clearing_instructions.ContainsKey("ids") == false)
+                    return new PacketFail(417,"In order to delete specific tags, its required to provide a list containing the IDs");
+
+                var ids_from_request = (IEnumerable<object>) clearing_instructions["ids"];
+                var ids = ids_from_request.Select(x => Convert.ToInt64(x)).ToList();
+
+                if (ids.Count == 0)
+                    return new PacketFail(417,"In order to delete specific tags, its required to provide a non-empty list of IDs");
+
+                tags_deleted = await this.dao.ClearSome(ids);
+
+            }
+            else
+                tags_deleted = await this.dao.ClearAll();
+
             return new PacketSuccess(200,new Dictionary<string,object> {
                 ["tagsDeleted"] = tags_deleted,
                 ["deleted"] = tags_deleted > 0

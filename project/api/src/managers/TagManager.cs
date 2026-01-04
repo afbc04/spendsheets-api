@@ -25,13 +25,13 @@ public class TagManager {
         
     }
 
-    public async Task<SendingPacket> Clear(string? extracted_token) {
+    public async Task<SendingPacket> Clear(string? extracted_token, IDictionary<string,object> request_data) {
         
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
                 using (await tag.Lock.WriterLockAsync())
-                    return await tag.Clear();
+                    return await tag.Clear(request_data);
             });
         
     }

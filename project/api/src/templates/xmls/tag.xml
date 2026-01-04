@@ -17,6 +17,10 @@
 
     <template id="clear">
         <auth required="true"/>
+        <body required="true">
+            <i name="clearAll" required="true" datatype="boolean"/>
+            <i name="ids" list="true" datatype="integer"/>
+        </body>
     </template>
 
     <template id="get">
