@@ -32,7 +32,7 @@
         </query>
     </template>
 
-    <!--template id="update-all">
+    <template id="update-all">
         <auth required="true"/>
         <query>
             <q name="active" />
@@ -42,7 +42,7 @@
             <i name="moneyAmount" null="true" datatype="float" />
             <i name="active" datatype="boolean" />
         </body>
-    </template-->
+    </template>
 
     <template id="get">
         <auth />

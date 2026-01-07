@@ -66,24 +66,14 @@ namespace DAO {
 
         }
 
-        public async Task<long> ClearAll() {
+        public async Task<long> Clear(IList<long>? ids) {
 
-            const string sql = "DELETE FROM Categories;";
+            string specific_ids = ids == null ? "" : "WHERE id = ANY(@ids)";
+            string sql = $"DELETE FROM Categories {specific_ids};";
             return await DAOUtils.Query(sql, async cmd => {
 
-                var deleted_rows_count = await cmd.ExecuteNonQueryAsync();
-                return deleted_rows_count;
-
-            });
-            
-        }
-
-        public async Task<long> ClearSome(IList<long> list_of_ids) {
-
-            const string sql = @"DELETE FROM Categories WHERE id = ANY(@ids);";
-            return await DAOUtils.Query(sql, async cmd => {
-
-                cmd.Parameters.AddWithValue("@ids", list_of_ids.ToArray());
+                if (ids != null && ids.Any())
+                    cmd.Parameters.AddWithValue("@ids", ids!.ToArray());
 
                 var deleted_rows_count = await cmd.ExecuteNonQueryAsync();
                 return deleted_rows_count;

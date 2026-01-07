@@ -1,6 +1,7 @@
 using Npgsql;
 using NpgsqlTypes;
 using Serilog;
+using DTO;
 
 namespace DAO {
 
@@ -133,81 +134,90 @@ namespace DAO {
 
         }
 
-        public async Task<long> ClearAll(bool? active) {
+        public async Task<long> Clear(IList<long>? ids, bool? active) {
 
-            string active_filter = active == null ? "" : "WHERE isActive = @active";
-            string sql = $"DELETE FROM MonthlyServices {active_filter};";
+            var where_sql = new List<string>();
+            string sql = "DELETE FROM MonthlyServices";
+
+            if (ids != null && ids.Any())
+                where_sql.Add("id = ANY(@ids)");
+
+            if (active != null)
+                where_sql.Add("isActive = @active");
+
+            if (where_sql.Any())
+                sql += " WHERE " + string.Join(" AND ", where_sql);
+
+            sql += ";";
+
             return await DAOUtils.Query(sql, async cmd => {
+
+                if (ids != null && ids.Any())
+                    cmd.Parameters.AddWithValue("@ids", ids.ToArray());
 
                 if (active != null)
                     cmd.Parameters.AddWithValue("@active", active);
 
-                var deleted_rows_count = await cmd.ExecuteNonQueryAsync();
-                return deleted_rows_count;
+                return await cmd.ExecuteNonQueryAsync();
 
             });
-            
         }
 
-        public async Task<long> ClearSome(IList<long> list_of_ids, bool? active) {
+        public async Task<long> Map(MonthlyServiceMapDTO monthlyService, IList<long>? ids, bool? is_active) {
 
-            string active_filter = active == null ? "" : "AND isActive = @active";
-            string sql = $"DELETE FROM MonthlyServices WHERE id = ANY(@ids) {active_filter};";
+            // Update Statements
+            var update_statements = new List<string>();
+
+            if (monthlyService.fields_changed[(int)MonthlyServiceMapDTOFields.moneyAmount])
+                update_statements.Add("moneyAmount = @moneyAmount");
+
+            if (monthlyService.fields_changed[(int)MonthlyServiceMapDTOFields.active])
+                update_statements.Add("isActive = @isActive");
+
+            if (!update_statements.Any())
+                return 0;
+
+            // Filter Statements
+            var where_clauses = new List<string>();
+
+            if (ids != null)
+                where_clauses.Add("id = ANY(@ids)");
+
+            if (is_active != null)
+                where_clauses.Add("isActive = @filterIsActive");
+
+            var where_sql = where_clauses.Any() ? "WHERE " + string.Join(" AND ", where_clauses) : "";
+
+            // Prepare SQL
+            string sql = $@"
+                UPDATE MonthlyServices
+                SET 
+                    {string.Join(", ", update_statements)}
+                {where_sql};";
+
             return await DAOUtils.Query(sql, async cmd => {
 
-                if (active != null)
-                    cmd.Parameters.AddWithValue("@active", active);
-
-                cmd.Parameters.AddWithValue("@ids", list_of_ids.ToArray());
-
-                var deleted_rows_count = await cmd.ExecuteNonQueryAsync();
-                return deleted_rows_count;
-
-            });
-            
-        }
-
-        /*
-        public async Task<bool> MapSome(MonthlyServiceSimple monthlyService, IList<long> list_of_ids, bool? active) {
-
-            try {
-
-                const string sql = @"
-                    UPDATE MonthlyServices
-                    SET 
-                        moneyAmount = @moneyAmount,
-                        isActive = @isActive
-                    WHERE WHERE id = ANY(@ids) {active_filter}";
-
-                return await DAOUtils.Query(sql, async cmd => {
-
-                    cmd.Parameters.Add("@name", NpgsqlDbType.Varchar)
-                        .Value = monthlyService.name;
-
-                    cmd.Parameters.Add("@description", NpgsqlDbType.Varchar)
-                        .Value = (object?) monthlyService.description ?? DBNull.Value;
-
-                    cmd.Parameters.Add("@categoryRelated", NpgsqlDbType.Bigint)
-                        .Value = (object?) monthlyService.category_related ?? DBNull.Value;
-
+                if (monthlyService.fields_changed[(int) MonthlyServiceMapDTOFields.moneyAmount])
                     cmd.Parameters.Add("@moneyAmount", NpgsqlDbType.Integer)
                         .Value = (object?) monthlyService.money_amount ?? DBNull.Value;
 
+                if (monthlyService.fields_changed[(int) MonthlyServiceMapDTOFields.active])
                     cmd.Parameters.Add("@isActive", NpgsqlDbType.Boolean)
-                        .Value = monthlyService.active;
+                        .Value = monthlyService.is_active;
 
-                    await cmd.ExecuteNonQueryAsync();
-                    return true;
+                if (ids != null)
+                    cmd.Parameters.Add("@ids", NpgsqlDbType.Array | NpgsqlDbType.Bigint)
+                        .Value = ids.ToArray();
 
-                });
+                if (is_active != null)
+                    cmd.Parameters.Add("@filterIsActive", NpgsqlDbType.Boolean)
+                        .Value = is_active;
 
-            }
-            catch (Exception ex) {
-                Log.Error(ex.StackTrace ?? ex.Message);
-                return false;
-            }
+                return await cmd.ExecuteNonQueryAsync();
 
-        }*/
+            });
+
+        }
 
         public async Task<long?> Create(MonthlyServiceSimple monthlyService) {
 
@@ -265,6 +275,9 @@ namespace DAO {
                     WHERE id = @id";
 
                 return await DAOUtils.Query(sql, async cmd => {
+
+                    cmd.Parameters.Add("@id", NpgsqlDbType.Bigint)
+                        .Value = monthlyService.ID;
 
                     cmd.Parameters.Add("@name", NpgsqlDbType.Varchar)
                         .Value = monthlyService.name;

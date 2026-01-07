@@ -36,6 +36,15 @@ public static class MonthlyServiceRouters {
 
         });
 
+        // PATCH /v1.0/monthlyServices
+        app.MapPatch("", async (HttpRequest request) => {
+
+            return await PacketUtils.validate_and_reply(request, "monthly-service/update-all", async (packet) => {
+                return PacketUtils.send_packet(await api.MonthlyService.Map(packet.token!,packet.body!,packet.queries));
+            });
+
+        });
+
         // GET /v1.0/monthlyServices/:id
         app.MapGet("{id}", async (HttpRequest request, string id) => {
 

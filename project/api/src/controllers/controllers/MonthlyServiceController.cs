@@ -80,16 +80,75 @@ namespace Controller {
                 if (ids.Count == 0)
                     return new PacketFail(417,"In order to delete specific monthly services, its required to provide a non-empty list of IDs");
 
-                monthly_services_deleted = await this.dao.ClearSome(ids,active_filter);
+                monthly_services_deleted = await this.dao.Clear(ids,active_filter);
 
             }
             else
-                monthly_services_deleted = await this.dao.ClearAll(active_filter);
+                monthly_services_deleted = await this.dao.Clear(null,active_filter);
 
             return new PacketSuccess(200,new Dictionary<string,object> {
                 ["monthlyServicesDeleted"] = monthly_services_deleted,
                 ["deleted"] = monthly_services_deleted > 0
             });
+
+        }
+
+        public async Task<SendingPacket> Map(IDictionary<string,object> monthly_services_data, QueriesRequest? query_request) {
+
+            bool clear_specific = query_request != null && query_request.queries.ContainsKey("ids");
+            
+            bool? active_filter = null;
+            if (query_request != null && query_request.queries.ContainsKey("active"))
+                active_filter = Convert.ToBoolean(query_request.queries["active"]!);
+            
+            List<long>? ids = null;
+
+            if (clear_specific) {
+
+                ids = new List<long>();
+                var ids_extracted = ((string) query_request!.queries["ids"]!).Split(',', StringSplitOptions.RemoveEmptyEntries);
+                long? extracted_id;
+                bool all_valid_ids = true;
+
+                foreach (string id in ids_extracted) {
+
+                    extracted_id = Utils.to_number(id);
+
+                    if (extracted_id != null)
+                        ids.Add((long) extracted_id);
+                    else
+                        all_valid_ids = false;
+
+                }
+
+                if (all_valid_ids == false)
+                    return new PacketFail(417,"In order to update specific monthly services, its required to provide a list containing valid tag IDs");
+                
+                if (ids.Count == 0)
+                    return new PacketFail(417,"In order to update specific monthly services, its required to provide a non-empty list of IDs");
+
+            }
+
+            try {
+
+                var monthly_service_dto = new MonthlyServiceMapDTO();
+
+                if (monthly_services_data.ContainsKey("moneyAmount")) monthly_service_dto.set_money_amount((double?) monthly_services_data["moneyAmount"]);
+                if (monthly_services_data.ContainsKey("active")) monthly_service_dto.set_active((bool) monthly_services_data["active"]);
+
+                if (monthly_service_dto.does_updates_anything() == false)
+                    return new PacketFail(417,"Data provided does not update anything");
+
+                long monthly_services_updated = await this.dao.Map(monthly_service_dto,ids,active_filter);
+                return new PacketSuccess(200,new Dictionary<string,object> {
+                    ["monthlyServicesUpdated"] = monthly_services_updated,
+                    ["updated"] = monthly_services_updated > 0
+                });
+
+            }
+            catch (MonthlyServiceDTOException ex) {
+                return new PacketFail(417,ex.message);
+            }
 
         }
 

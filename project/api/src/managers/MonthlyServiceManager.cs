@@ -38,6 +38,17 @@ public class MonthlyServiceManager {
         
     }
 
+    public async Task<SendingPacket> Map(string? extracted_token, IDictionary<string,object> request_data, QueriesRequest? query) {
+        
+        using (await config.Lock.ReaderLockAsync())
+        using (await token.Lock.ReaderLockAsync())
+            return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
+                using (await monthly_service.Lock.WriterLockAsync())
+                    return await monthly_service.Map(request_data,query);
+            });
+        
+    }
+
     public async Task<SendingPacket> Create(string extracted_token, IDictionary<string,object> request_data) {
 
         using (await config.Lock.ReaderLockAsync())

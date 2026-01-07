@@ -74,11 +74,11 @@ namespace Controller {
                 if (ids.Count == 0)
                     return new PacketFail(417,"In order to delete specific tags, its required to provide a non-empty list of IDs");
 
-                tags_deleted = await this.dao.ClearSome(ids);
+                tags_deleted = await this.dao.Clear(ids);
 
             }
             else
-                tags_deleted = await this.dao.ClearAll();
+                tags_deleted = await this.dao.Clear(null);
 
             return new PacketSuccess(200,new Dictionary<string,object> {
                 ["tagsDeleted"] = tags_deleted,
