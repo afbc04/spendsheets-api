@@ -4,6 +4,10 @@ public class Utils {
         return money / 100m;
     }
 
+    public static decimal convert_to_money(int money) {
+        return money / 100m;
+    }
+
     public static long convert_from_money(double money) {
 
         decimal value = Convert.ToDecimal(money);

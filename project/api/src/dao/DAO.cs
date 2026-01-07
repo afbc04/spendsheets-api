@@ -33,6 +33,11 @@ namespace DAO {
             await DAOTableCreator.Categories();
             await DAOIndexCreator.CategoriesName();
 
+            await DAOTableCreator.MonthlyServices();
+            await DAOIndexCreator.MonthlyServicesName();
+            await DAOIndexCreator.MonthlyServicesActive();
+            await DAOViewCreator.MonthlyServices();
+
         }
 
     }

@@ -135,36 +135,48 @@ namespace PacketTemplates {
             return body;
         }
 
-        private static TemplateValidatorQuery? handle_query(XElement template) {
+        private static bool handle_page(XElement template) {
 
-            var query_element = template.Element("query");
+            var page_element = template.Element("page");
+            return page_element != null;
 
-            if (query_element == null)
-                return null;
-
-            bool has_page = (query_element.Attribute("page")?.Value ?? "FALSE").ToUpper() == "TRUE";
-            
-            var sort_string = query_element.Attribute("sort")?.Value;
-            HashSet<string> sort_opts = new HashSet<string>();
-
-            if (string.IsNullOrWhiteSpace(sort_string) == false)
-                sort_opts = new HashSet<string>(sort_string.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
-            
-
-            var query = new TemplateValidatorQuery(has_page);
-
-            var inner_queries = handle_inner_query(query_element);
-            query.add_queries(inner_queries);
-            query.add_sort_opts(sort_opts);
-
-            return query;
         }
 
-        private static Dictionary<string, TemplateValidatorQueryItem> handle_inner_query(XElement element) {
+        private static Dictionary<string,TemplateValidatorQuerySortItem>? handle_sort(XElement template) {
 
+            var sort_element = template.Element("sort");
+            var list = new Dictionary<string, TemplateValidatorQuerySortItem>();
+
+            if (sort_element == null)
+                return null;
+
+
+            var items = sort_element.Elements("s");
+            foreach (var item in items) {
+
+                var item_name = item.Attribute("name")?.Value;
+                if (item_name == null)
+                    continue;
+
+                bool is_case_insensitive = (item.Attribute("caseInsensitive")?.Value ?? "FALSE").ToUpper() == "TRUE";
+
+                list[item_name] = new TemplateValidatorQuerySortItem(is_case_insensitive);
+            
+            }
+
+            return list;
+
+        }
+
+        private static Dictionary<string, TemplateValidatorQueryItem> handle_queries(XElement template) {
+
+            var query_element = template.Element("query");
             var queries = new Dictionary<string, TemplateValidatorQueryItem>();
 
-            var items = element.Elements("q");
+            if (query_element == null)
+                return queries;
+
+            var items = query_element.Elements("q");
             foreach (var item in items) {
 
                 var item_name = item.Attribute("name")?.Value;
@@ -182,6 +194,21 @@ namespace PacketTemplates {
             }
 
             return queries;
+            
+        }
+
+        private static TemplateValidatorQuery handle_query(XElement template) {
+
+            bool has_page = handle_page(template);
+            var sort_list = handle_sort(template);
+            var queries = handle_queries(template);
+
+            var query =  new TemplateValidatorQuery(has_page);
+            query.add_sort_opts(sort_list);
+            query.add_queries(queries);
+
+            return query;
+
         }
 
         public static TemplateObject? get_template(string id) {

@@ -26,9 +26,18 @@ public class Query {
         return this._params;
     }
 
-    public string? getSort() {
-        return this._order.Count == 0 ? null : "ORDER BY " + string.Join(" , ", this._order.Select(s => $"{s.value} {(s.is_asc ? "ASC" : "DESC")}"));
+    public string? getSort(){
+
+        if (_order.Count == 0)
+            return null;
+
+        return "ORDER BY " + string.Join(", ",_order.Select(s => {
+                var value = s.is_case_insensitive ? $"LOWER({s.value})" : s.value;
+                return $"{value} {(s.is_asc ? "ASC" : "DESC")}";
+            }));
+
     }
+
 
     public void setFilter(string column, string op, object? value) {
 
@@ -42,8 +51,8 @@ public class Query {
         this._order = order;
     }
 
-    public void setSort(string column, bool is_asc) {
-        _order.Add(new QueryOrderItem(column,is_asc));
+    public void setSort(string column, bool is_asc, bool is_case_insensitive) {
+        _order.Add(new QueryOrderItem(column,is_asc,is_case_insensitive));
     }
 
     public void setLimit(long limit) {

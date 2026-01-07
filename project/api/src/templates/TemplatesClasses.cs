@@ -69,21 +69,30 @@ namespace PacketTemplates {
 
     }
 
+    public struct TemplateValidatorQuerySortItem {
+
+        public bool is_case_insensitive { get; set; }
+
+        public TemplateValidatorQuerySortItem(bool is_case_insensitive) {
+            this.is_case_insensitive = is_case_insensitive;
+        }
+
+    }
+
     public class TemplateValidatorQuery {
         
         public bool has_page { get; set; }
-        public HashSet<string> sort_opts {get; set;}
+        public Dictionary<string, TemplateValidatorQuerySortItem>? sort_opts {get; set;}
         public Dictionary<string, TemplateValidatorQueryItem> queries { get; set; }
 
         public TemplateValidatorQuery(bool has_page) {
             this.has_page = has_page;
             this.queries = new();
-            this.sort_opts = new();
+            this.sort_opts = null;
 
             if (has_page) {
                 this.queries["page"] = new TemplateValidatorQueryItem(typeof(long));
                 this.queries["limit"] = new TemplateValidatorQueryItem(typeof(long));
-                this.queries["sort"] = new TemplateValidatorQueryItem(typeof(string));
             }
 
         }
@@ -95,8 +104,20 @@ namespace PacketTemplates {
 
         }
 
-        public void add_sort_opts(HashSet<string> sort_opts) {
-            this.sort_opts = sort_opts.Select(s => s.ToLower()).ToHashSet();
+        public void add_sort_opts(Dictionary<string, TemplateValidatorQuerySortItem>? sort_opts) {
+            
+            if (sort_opts != null) {
+
+                this.sort_opts = new();
+                this.queries["sort"] = new TemplateValidatorQueryItem(typeof(string));
+
+                foreach(string key in sort_opts.Keys)
+                    this.sort_opts[key] = sort_opts[key];
+
+            }
+            else
+                this.sort_opts = null;
+
         }
 
     }

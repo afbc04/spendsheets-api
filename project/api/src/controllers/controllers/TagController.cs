@@ -45,19 +45,32 @@ namespace Controller {
 
         }
 
-        public async Task<SendingPacket> Clear(IDictionary<string,object> clearing_instructions) {
+        public async Task<SendingPacket> Clear(QueriesRequest? query_request) {
 
-            bool clear_all = (bool) clearing_instructions["clearAll"];
+            bool clear_specific = query_request != null && query_request.queries.ContainsKey("ids");
             long tags_deleted;
 
-            if (clear_all == false) {
+            if (clear_specific) {
 
-                if (clearing_instructions.ContainsKey("ids") == false)
-                    return new PacketFail(417,"In order to delete specific tags, its required to provide a list containing the IDs");
+                var ids = new List<long>();
+                var ids_extracted = ((string) query_request!.queries["ids"]!).Split(',', StringSplitOptions.RemoveEmptyEntries);
+                long? extracted_id;
+                bool all_valid_ids = true;
 
-                var ids_from_request = (IEnumerable<object>) clearing_instructions["ids"];
-                var ids = ids_from_request.Select(x => Convert.ToInt64(x)).ToList();
+                foreach (string id in ids_extracted) {
 
+                    extracted_id = Utils.to_number(id);
+
+                    if (extracted_id != null)
+                        ids.Add((long) extracted_id);
+                    else
+                        all_valid_ids = false;
+
+                }
+
+                if (all_valid_ids == false)
+                    return new PacketFail(417,"In order to delete specific tags, its required to provide a list containing valid tag IDs");
+                
                 if (ids.Count == 0)
                     return new PacketFail(417,"In order to delete specific tags, its required to provide a non-empty list of IDs");
 

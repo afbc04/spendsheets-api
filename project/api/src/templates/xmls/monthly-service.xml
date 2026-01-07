@@ -9,6 +9,7 @@
         </sort>
         <query>
             <q name="name" datatype="string" />
+            <q name="active" datatype="boolean" />
         </query>
     </template>
 
@@ -17,15 +18,31 @@
         <body required="true">
             <i name="name" required="true"/>
             <i name="description" null="true"/>
+            <i name="categoryRelatedId" null="true" datatype="integer" />
+            <i name="moneyAmount" null="true" datatype="float" />
+            <i name="active" datatype="boolean" />
         </body>
     </template>
 
     <template id="clear">
         <auth required="true"/>
         <query>
+            <q name="active" />
             <q name="ids" />
         </query>
     </template>
+
+    <!--template id="update-all">
+        <auth required="true"/>
+        <query>
+            <q name="active" />
+            <q name="ids" />
+        </query>
+        <body required="true">
+            <i name="moneyAmount" null="true" datatype="float" />
+            <i name="active" datatype="boolean" />
+        </body>
+    </template-->
 
     <template id="get">
         <auth />
@@ -34,16 +51,22 @@
     <template id="update-full">
         <auth required="true"/>
         <body required="true">
-            <i name="name" required="true" />
+            <i name="name" required="true"/>
             <i name="description" null="true"/>
+            <i name="categoryRelatedId" null="true" datatype="integer" />
+            <i name="moneyAmount" null="true" datatype="float" />
+            <i name="active" datatype="boolean" />
         </body>
     </template>
 
     <template id="update-partial">
         <auth required="true"/>
         <body required="true">
-            <i name="name" />
+            <i name="name"/>
             <i name="description" null="true"/>
+            <i name="categoryRelatedId" null="true" datatype="integer" />
+            <i name="moneyAmount" null="true" datatype="float" />
+            <i name="active" datatype="boolean" />
         </body>
     </template>
 

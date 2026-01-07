@@ -14,7 +14,6 @@
     - ID
     - Name
     - Description
-    - When was created
     - Category Related
     - Money amount
     - Is it active?

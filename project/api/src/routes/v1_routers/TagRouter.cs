@@ -31,7 +31,7 @@ public static class TagRouters {
         app.MapDelete("", async (HttpRequest request) => {
 
             return await PacketUtils.validate_and_reply(request, "tag/clear", async (packet) => {
-                return PacketUtils.send_packet(await api.Tag.Clear(packet.token!,packet.body!));
+                return PacketUtils.send_packet(await api.Tag.Clear(packet.token!,packet.queries));
             });
 
         });

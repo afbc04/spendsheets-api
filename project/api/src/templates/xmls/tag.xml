@@ -2,7 +2,12 @@
 
     <template id="list">
         <auth />
-        <query page="true" sort="id,name">
+        <page />
+        <sort>
+            <s name="id" />
+            <s name="name" caseInsensitive="true" />
+        </sort>
+        <query>
             <q name="name" datatype="string" />
         </query>
     </template>
@@ -17,10 +22,9 @@
 
     <template id="clear">
         <auth required="true"/>
-        <body required="true">
-            <i name="clearAll" required="true" datatype="boolean"/>
-            <i name="ids" list="true" datatype="integer"/>
-        </body>
+        <query>
+            <q name="ids" />
+        </query>
     </template>
 
     <template id="get">

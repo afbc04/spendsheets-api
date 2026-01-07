@@ -107,48 +107,49 @@ namespace PacketHandlers {
 
         }
 
-        private static (PacketQueryValidatorPage?,List<string>) validate_packet_query_fields_page(Dictionary<string, object> data, bool has_pageable, HashSet<string> sort_opts) {
+        private static (PacketQueryValidatorPage?,List<string>) validate_packet_query_fields_page(Dictionary<string, object> data, bool has_pageable, Dictionary<string, TemplateValidatorQuerySortItem>? sort_opts) {
             
             var error_list = new List<string>();
-
-            if (has_pageable == false)
-                return (null,error_list);
 
             var page = Convert.ToInt64(PacketUtils.get_value(data,"page") ?? PageRules.page_default);
             var limit = Convert.ToInt64(PacketUtils.get_value(data,"limit") ?? PageRules.limit_default);
             var sort = (string?) PacketUtils.get_value(data,"sort");
 
-            if (page <= 0)
-                error_list.Add("Page number must be a positive number");
+            if (has_pageable) {
 
-            if (limit < PageRules.limit_min) {
-                error_list.Add($"Limit is too low. Minimum is {PageRules.limit_min}");
-            }
+                if (page <= 0)
+                    error_list.Add("Page number must be a positive number");
 
-            if (limit > PageRules.limit_max) {
-                error_list.Add($"Limit is too high. Maximum is {PageRules.limit_max}");
+                if (limit < PageRules.limit_min) {
+                    error_list.Add($"Limit is too low. Minimum is {PageRules.limit_min}");
+                }
+
+                if (limit > PageRules.limit_max) {
+                    error_list.Add($"Limit is too high. Maximum is {PageRules.limit_max}");
+                }
+
             }
 
             List<QueryOrderItem> sort_list = new();
 
-            if (sort != null) {
+            if (sort != null && sort_opts != null) {
 
                 if (Regex.IsMatch(sort,@"{(\w[\w_]*:-?1)(,(\w[\w_]*:-?1))*}") == false)
                     error_list.Add($"Sort arguments are not valid. List should have the format : {{<name>:(1 or -1)}} (item divided by ',')");
                 else {
 
                     string[] sorting_tokens = sort.Replace("{","").Replace("}","").Split(",");
-                    string sort_options = string.Join(", ",sort_opts);
+                    string sort_options = string.Join(", ",sort_opts.Keys);
 
                     foreach (string token in sorting_tokens) {
 
                         string[] token_args = token.Split(":");
                         bool is_asc = Convert.ToInt32(token_args[1]) == 1;
 
-                        if (sort_opts.Contains(token_args[0].ToLower()) == false) 
+                        if (sort_opts.ContainsKey(token_args[0].ToLower()) == false) 
                             error_list.Add($"Sort argument {token_args[0]} is not valid. Try these ones : [{sort_options}]");
                         else 
-                            sort_list.Add(new QueryOrderItem(token_args[0],is_asc));
+                            sort_list.Add(new QueryOrderItem(token_args[0],is_asc,sort_opts[token_args[0].ToLower()].is_case_insensitive));
 
                     }
 

@@ -2,14 +2,16 @@ using PacketHandlers;
 using Controller;
 using Queries;
 
-public class TagManager {
+public class MonthlyServiceManager {
 
     private ConfigController config;
     private TokenController token;
-    private TagController tag;
+    private CategoryController category;
+    private MonthlyServiceController monthly_service;
 
-    public TagManager(TagController tag, TokenController token, ConfigController config) {
-        this.tag = tag;
+    public MonthlyServiceManager(MonthlyServiceController monthly_service,CategoryController category, TokenController token, ConfigController config) {
+        this.monthly_service = monthly_service;
+        this.category = category;
         this.token = token;
         this.config = config;
     }
@@ -19,8 +21,8 @@ public class TagManager {
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenReaderPublic(config,token,extracted_token,async (access_token) => {
-                using (await tag.Lock.ReaderLockAsync())
-                    return await tag.List(query);
+                using (await monthly_service.Lock.ReaderLockAsync())
+                    return await monthly_service.List(query);
             });
         
     }
@@ -30,8 +32,8 @@ public class TagManager {
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
-                using (await tag.Lock.WriterLockAsync())
-                    return await tag.Clear(query);
+                using (await monthly_service.Lock.WriterLockAsync())
+                    return await monthly_service.Clear(query);
             });
         
     }
@@ -41,8 +43,16 @@ public class TagManager {
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
-                using (await tag.Lock.WriterLockAsync())
-                    return await tag.Create(request_data);
+                using (await category.Lock.ReaderLockAsync())
+                using (await monthly_service.Lock.WriterLockAsync()) {
+
+                    Category? category = null;
+                    if (request_data.ContainsKey("categoryRelatedId"))
+                        category = await this.category._Get((long) request_data["categoryRelatedId"]);
+
+                    return await monthly_service.Create(request_data,category);
+
+                }
             });
 
     }
@@ -52,8 +62,8 @@ public class TagManager {
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenReaderPublic(config,token,extracted_token,async (access_token) => {
-                using (await tag.Lock.ReaderLockAsync())
-                    return await tag.Get(id);
+                using (await monthly_service.Lock.ReaderLockAsync())
+                    return await monthly_service.Get(id);
             });
         
     }
@@ -63,8 +73,8 @@ public class TagManager {
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
-                using (await tag.Lock.WriterLockAsync())
-                    return await tag.Delete(id);
+                using (await monthly_service.Lock.WriterLockAsync())
+                    return await monthly_service.Delete(id);
             });
 
     }
@@ -74,8 +84,16 @@ public class TagManager {
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
-                using (await tag.Lock.WriterLockAsync())
-                    return await tag.Patch(request_data,id);
+                using (await category.Lock.ReaderLockAsync())
+                using (await monthly_service.Lock.WriterLockAsync()) {
+
+                    Category? category = null;
+                    if (request_data.ContainsKey("categoryRelatedId") && request_data["categoryRelatedId"] != null)
+                        category = await this.category._Get((long) request_data["categoryRelatedId"]);
+
+                    return await monthly_service.Patch(request_data,id,category);
+
+                }
             });
 
     }
@@ -85,8 +103,16 @@ public class TagManager {
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
-                using (await tag.Lock.WriterLockAsync())
-                    return await tag.Update(request_data,id);
+                using (await category.Lock.ReaderLockAsync())
+                using (await monthly_service.Lock.WriterLockAsync()) {
+
+                    Category? category = null;
+                    if (request_data.ContainsKey("categoryRelatedId") && request_data["categoryRelatedId"] != null)
+                        category = await this.category._Get((long) request_data["categoryRelatedId"]);
+
+                    return await monthly_service.Update(request_data,id,category);
+
+                }
             });
 
     }

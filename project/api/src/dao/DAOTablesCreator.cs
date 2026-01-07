@@ -15,9 +15,9 @@ namespace DAO {
 
                   nameOfUser VARCHAR({ConfigRules.name_length_max}),
                   isPublic BOOLEAN NOT NULL,
-                  initMoney BIGINT NOT NULL,
-                  lostMoney BIGINT NOT NULL,
-                  savedMoney BIGINT NOT NULL
+                  initMoney INTEGER NOT NULL,
+                  lostMoney INTEGER NOT NULL,
+                  savedMoney INTEGER NOT NULL
                 );");
 
         public static async Task Tags() =>
@@ -34,6 +34,21 @@ namespace DAO {
                   id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
                   name VARCHAR({CategoryRules.name_length_max}) NOT NULL,
                   description VARCHAR({CategoryRules.description_length_max}) 
+                );");
+
+        public static async Task MonthlyServices() =>
+            await DAOUtils.CreateTableOrIndex(@$"
+                CREATE TABLE IF NOT EXISTS MonthlyServices (
+                  id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
+                  name VARCHAR({MonthlyServiceRules.name_length_max}) NOT NULL,
+                  description VARCHAR({MonthlyServiceRules.description_length_max}),
+                  categoryRelated BIGINT,
+                  moneyAmount INTEGER,
+                  isActive BOOLEAN NOT NULL,
+                CONSTRAINT fk_monthlyservices_category
+                  FOREIGN KEY (categoryRelated)
+                  REFERENCES Categories(id)
+                  ON DELETE SET NULL
                 );");
 
     }

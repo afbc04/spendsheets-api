@@ -25,13 +25,13 @@ public class CategoryManager {
         
     }
 
-    public async Task<SendingPacket> Clear(string? extracted_token, IDictionary<string,object> request_data) {
+    public async Task<SendingPacket> Clear(string? extracted_token, QueriesRequest? query) {
         
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
                 using (await category.Lock.WriterLockAsync())
-                    return await category.Clear(request_data);
+                    return await category.Clear(query);
             });
         
     }
