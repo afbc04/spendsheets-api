@@ -1,0 +1,64 @@
+<templates>
+
+    <template id="list">
+        <auth />
+        <page />
+        <sort>
+            <s name="id" />
+            <s name="name" caseInsensitive="true" />
+        </sort>
+        <query>
+            <q name="name" datatype="string" />
+        </query>
+    </template>
+
+    <template id="create">
+        <auth required="true"/>
+        <body required="true">
+            <i name="type" required="true"/>
+            <i name="categoryId" datatype="integer" null="true" />
+            <i name="money" required="true" datatype="float" />
+            <i name="date" datatype="date" />
+
+            <!--i name="beginDate" datatype="date" />
+            <i name="scheduledDueDate" datatype="date" />
+
+            <i name="tagIds" list="true" datatype="integer"/-->
+            <i name="description" null="true" />
+            <i name="visible" datatype="boolean" />
+            <i name="status" />
+        </body>
+    </template>
+
+    <template id="clear">
+        <auth required="true"/>
+        <query>
+            <q name="ids" />
+        </query>
+    </template>
+
+    <template id="get">
+        <auth />
+    </template>
+
+    <template id="update-full">
+        <auth required="true"/>
+        <body required="true">
+            <i name="name" required="true" />
+            <i name="description" null="true"/>
+        </body>
+    </template>
+
+    <template id="update-partial">
+        <auth required="true"/>
+        <body required="true">
+            <i name="name" />
+            <i name="description" null="true"/>
+        </body>
+    </template>
+
+    <template id="delete">
+        <auth required="true"/>
+    </template>
+
+</templates>

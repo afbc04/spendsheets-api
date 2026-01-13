@@ -31,7 +31,7 @@ namespace DTO {
                 if (money_amount < 0)
                     throw new MonthlyServiceDTOException("Initial money can not be negative");
 
-                this.money_amount = Convert.ToInt32(Utils.convert_from_money((double) money_amount));
+                this.money_amount = Money.Convert32((double) money_amount);
                 
             }
             

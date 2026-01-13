@@ -75,9 +75,9 @@ public class Config {
             ["name"] = this.name,
             ["public"] = this.is_visible_to_public,
             ["lastOnlineDate"] = Utils.convert_to_datetime(this.last_online_date),
-            ["initialMoney"] = Utils.convert_to_money(this.initial_money),
-            ["lostMoney"] = Utils.convert_to_money(this.lost_money),
-            ["savedMoney"] = Utils.convert_to_money(this.saved_money)
+            ["initialMoney"] = Money.Format(this.initial_money),
+            ["lostMoney"] = Money.Format(this.lost_money),
+            ["savedMoney"] = Money.Format(this.saved_money)
         };
     }
 

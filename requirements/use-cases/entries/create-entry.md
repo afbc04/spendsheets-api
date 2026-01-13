@@ -14,6 +14,7 @@
     - Type _(Transaction, Loan, Due Payment or Saving)_
     - Category _(Optional)_
     - Money (expected to be) removed or added into the wallet in the end _(Saving is always removed)_
+    - Date _(Optional : Only applied in Transaction)_
     - Begin Date _(Optional)_
     - Scheduled Due Date _(Optional : Only applied in Multiple Payment or Saving Entries)_
     - List of tags _(Optional)_

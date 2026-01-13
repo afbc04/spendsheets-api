@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Globalization;
 using PacketTemplates;
 using Queries;
 
@@ -97,6 +98,21 @@ namespace PacketHandlers {
 
                 if (Regex.IsMatch((string) item,@"^[\w%_\d{} :\.\-,]+$") == false)
                     pqv.wrong_datatype_fields[key] = PacketUtils.getType(requirements.datatype);
+
+            }
+            else if (requirements.datatype == typeof(DateOnly)) {
+
+                if (item is not string s ||
+                    Regex.IsMatch(s, @"^\d{4}-\d{2}-\d{2}$") == false ||
+                    !DateOnly.TryParseExact(
+                        s,
+                        "yyyy-MM-dd",
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out _))
+                {
+                    pqv.wrong_datatype_fields[key] = "date (yyyy-MM-dd)";
+                }
 
             }
             else {

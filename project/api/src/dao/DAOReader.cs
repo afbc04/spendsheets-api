@@ -2,6 +2,9 @@ using Npgsql;
 
 public static class DAOReader {
 
+    public static char getChar(this NpgsqlDataReader r, int index)
+        => r.GetChar(index);
+
     public static int getInt(this NpgsqlDataReader r, int index)
         => r.GetInt32(index);
 
@@ -24,10 +27,20 @@ public static class DAOReader {
     public static bool getBool(this NpgsqlDataReader r, int index)
         => r.GetBoolean(index);
 
+    public static bool? tryGetBool(this NpgsqlDataReader r, int index)
+        => r.IsDBNull(index) ? null : r.GetBoolean(index);
+
     public static byte[] getBytes(this NpgsqlDataReader r, int index)
         => r.GetFieldValue<byte[]>(index);
 
     public static DateTime getDateTime(this NpgsqlDataReader r, int index)
         => r.GetDateTime(index);
+
+    public static DateOnly getDate(this NpgsqlDataReader r, int index)
+        => r.GetFieldValue<DateOnly>(index);
+
+    public static DateOnly? tryGetDate(this NpgsqlDataReader r, int index)
+        => r.IsDBNull(index) ? null : r.GetFieldValue<DateOnly>(index);
+    
 
 }

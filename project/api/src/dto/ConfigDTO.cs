@@ -73,7 +73,7 @@ namespace DTO {
             if (initial_money < 0)
                 throw new ConfigDTOException("Initial money can not be negative");
 
-            this._config.initial_money = Utils.convert_from_money(initial_money);
+            this._config.initial_money = Money.Convert64(initial_money);
 
         }
 
@@ -82,7 +82,7 @@ namespace DTO {
             if (lost_money < 0)
                 throw new ConfigDTOException("Lost money can not be negative");
 
-            this._config.lost_money = Utils.convert_from_money(lost_money);
+            this._config.lost_money = Money.Convert64(lost_money);
 
         }
 
@@ -91,7 +91,7 @@ namespace DTO {
             if (saved_money < 0)
                 throw new ConfigDTOException("Saved money can not be negative");
 
-            this._config.saved_money = Utils.convert_from_money(saved_money);
+            this._config.saved_money = Money.Convert64(saved_money);
 
         }
 

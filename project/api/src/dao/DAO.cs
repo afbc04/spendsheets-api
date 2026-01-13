@@ -38,6 +38,14 @@ namespace DAO {
             await DAOIndexCreator.MonthlyServicesActive();
             await DAOViewCreator.MonthlyServices();
 
+            await DAOTableCreator.Entry();
+            await DAOTableCreator.EntryDeleted();
+            await DAOTableCreator.EntryCommitment();
+            await DAOViewCreator.EntryDetails();
+
+            await DAOTableCreator.EntryTags();
+            await DAOViewCreator.EntryTagsByTag();
+
         }
 
     }

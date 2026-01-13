@@ -20,6 +20,12 @@ namespace Controller {
             return await this.dao.Get(ID);
         }
 
+        public async Task<Tag?> _Get(string tag_id) {
+
+            long? id = Utils.to_number(tag_id);
+            return id != null ? await this.dao.Get((long) id) : null;
+        }
+
         public async Task<SendingPacket> Get(string _id) {
 
             return await ControllerHelper.IDIsNumber(_id, async (id) => {

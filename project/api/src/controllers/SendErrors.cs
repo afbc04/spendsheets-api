@@ -24,5 +24,7 @@ public static class SendErrors {
     public static SendingPacket WriterTokenNeeded() =>
         new PacketFail(403,"This endpoint requires a token in writer mode");
     
+    public static SendingPacket EntryDoesNotExists() =>
+        new PacketFail(404,"Entry does not exists");
 
 }

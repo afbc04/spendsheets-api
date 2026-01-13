@@ -22,6 +22,17 @@ namespace PacketTemplates {
         private static readonly string templates_directory = "src/templates/xmls";
         private static readonly Dictionary<string,TemplateObject> templates = new();
 
+        private static Type parse_datatype(string? text) {
+            return (text ?? "string").ToLower() switch {
+                "integer" => typeof(long),
+                "float"   => typeof(double),
+                "boolean" => typeof(bool),
+                "date"    => typeof(DateOnly),
+                _         => typeof(string)
+            };
+        }
+
+
         public static void LoadTemplates() {
 
             int templates_loaded = 0;
@@ -104,13 +115,7 @@ namespace PacketTemplates {
                 bool allow_null = (item.Attribute("null")?.Value ?? "FALSE").ToUpper() == "TRUE";
                 bool is_list = (item.Attribute("list")?.Value ?? "FALSE").ToUpper() == "TRUE";
 
-                Type datatype = (item.Attribute("datatype")?.Value ?? "string").ToLower() switch {
-                    "integer" => typeof(long),
-                    "float" => typeof(double),
-                    "boolean" => typeof(bool),
-                    _ => typeof(string)
-                };
-
+                Type datatype = parse_datatype(item.Attribute("datatype")?.Value);
                 body[item_name] = new TemplateValidatorItem(is_required, datatype, is_list, allow_null);
             }
 
@@ -183,13 +188,7 @@ namespace PacketTemplates {
                 if (item_name == null)
                     continue;
 
-                Type datatype = (item.Attribute("datatype")?.Value ?? "string").ToLower() switch {
-                    "integer" => typeof(long),
-                    "float" => typeof(double),
-                    "boolean" => typeof(bool),
-                    _ => typeof(string)
-                };
-
+                Type datatype = parse_datatype(item.Attribute("datatype")?.Value);
                 queries[item_name] = new TemplateValidatorQueryItem(datatype);
             }
 

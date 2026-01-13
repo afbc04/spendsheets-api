@@ -1,5 +1,6 @@
 using System.Text.Json;
 using PacketTemplates;
+using System.Globalization;
 
 namespace PacketHandlers {
 
@@ -93,13 +94,41 @@ namespace PacketHandlers {
         }
 
         private static PacketBodyValidatorObject _validate_packet_body_fields_rec_value_item(object item, TemplateValidatorItem requirements, string path, PacketBodyValidatorObject pbv) {
-
-            if ((item == null && requirements.allow_null == false) || (item != null && requirements.datatype != item.GetType()))
-                pbv.wrong_datatype_fields[path] = string.Concat(PacketUtils.getType(requirements.datatype),requirements.allow_null ? " | null" : "");
             
-            return pbv;
+            if (item == null) {
+                if (!requirements.allow_null)
+                    pbv.wrong_datatype_fields[path] =
+                        PacketUtils.getType(requirements.datatype);
+                return pbv;
+            }
 
+            if (requirements.datatype == typeof(DateOnly)) {
+
+                if (item is not string s ||
+                    !DateOnly.TryParseExact(
+                        s,
+                        "yyyy-MM-dd",
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out _))
+                {
+                    pbv.wrong_datatype_fields[path] =
+                        "date (yyyy-MM-dd)" +
+                        (requirements.allow_null ? " | null" : "");
+                }
+
+                return pbv;
+            }
+
+            if (requirements.datatype != item.GetType()) {
+                pbv.wrong_datatype_fields[path] =
+                    PacketUtils.getType(requirements.datatype) +
+                    (requirements.allow_null ? " | null" : "");
+            }
+
+            return pbv;
         }
+
 
         private static PacketBodyValidatorObject _validate_packet_body_fields_rec_value_object(object obj, TemplateValidatorObject requirements, string path, PacketBodyValidatorObject pbv) {
             

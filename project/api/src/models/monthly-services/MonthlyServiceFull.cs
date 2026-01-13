@@ -20,7 +20,7 @@ public class MonthlyServiceFull : MonthlyService {
             ["name"] = this.name,
             ["description"] = this.description,
             ["categoryRelated"] = this.category_related?.to_json(),
-            ["moneyAmount"] = this.money_amount == null ? null : Utils.convert_to_money((int) this.money_amount),
+            ["moneyAmount"] = this.money_amount == null ? null : Money.Format((int) this.money_amount),
             ["active"] = this.active
         };
     }
