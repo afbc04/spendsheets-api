@@ -40,11 +40,11 @@ namespace DAO {
 
             await DAOTableCreator.Entry();
             await DAOTableCreator.EntryDeleted();
-            await DAOTableCreator.EntryCommitment();
-            await DAOViewCreator.EntryDetails();
 
             await DAOTableCreator.EntryTags();
             await DAOViewCreator.EntryTagsByTag();
+            
+            await DAOViewCreator.EntryDetails();
 
         }
 

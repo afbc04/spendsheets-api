@@ -23,10 +23,9 @@ namespace DTO {
             this._entry = new EntryTransaction(ID,true,0);
         }
 
-        /*
         public EntryTransactionDTO(EntryTransaction entry) {
             this._entry = new EntryTransaction(entry);
-        }*/
+        }
 
         // Final method
         public EntryTransaction extract() {
@@ -43,6 +42,15 @@ namespace DTO {
                 throw new EntryTransactionDTOException($"Category provided does not exists");
 
             this._entry.category_ID = category?.ID;
+
+        }
+
+        public void set_monthly_service(bool was_monthly_service_id_provided, MonthlyService? monthly_service) {
+
+            if (monthly_service == null && was_monthly_service_id_provided == true)
+                throw new EntryTransactionDTOException($"Monthly Service provided does not exists");
+
+            this._entry.monthly_service_ID = monthly_service?.ID;
 
         }
         
@@ -74,20 +82,11 @@ namespace DTO {
 
         public void set_status(string status) {
 
-            status = status.ToLower();
-
-            switch (status) {
-                case "draft":
-                    this._entry.setStatusDraft();
-                    break;
-                case "done":
-                    this._entry.setStatusDone();
-                    break;
-                case "deleted":
-                    this._entry.setStatusDeleted();
-                    break;
-                default:
-                    throw new EntryTransactionDTOException("Status provided is not valid in Transaction Entries");
+            try {
+                this._entry.setStatus(status);
+            }
+            catch (EntryException ex) {
+                throw new EntryTransactionDTOException(ex.message);
             }
 
         }

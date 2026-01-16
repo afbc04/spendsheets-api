@@ -6,11 +6,12 @@ namespace DAO {
 
         public static EntryTransaction serialize_transaction(NpgsqlDataReader r) {
 
-            var deleted_entry = _serialize_deleted_entry(r);
+            var deleted_entry_state = _serialize_deleted_entry(r);
 
             return new EntryTransaction(
                 r.getLong((int) EntryDetailsFields.id),
                 r.tryGetLong((int) EntryDetailsFields.category_id),
+                r.tryGetLong((int) EntryDetailsFields.monthly_service_id),
                 r.getBool((int) EntryDetailsFields.is_visible),
                 r.getInt((int) EntryDetailsFields.money_amount),
                 r.getDate((int) EntryDetailsFields.date),
@@ -19,7 +20,7 @@ namespace DAO {
                 r.tryGetDate((int) EntryDetailsFields.finish_date),
                 r.tryGetString((int) EntryDetailsFields.description),
                 EntryStatusHandler.exportDAO(r.getChar((int) EntryDetailsFields.status)),
-                deleted_entry
+                deleted_entry_state
             );
         }
 
@@ -27,46 +28,41 @@ namespace DAO {
 
             var category = _serialize_category_of_entry(r);
             var monthly_service = _serialize_monthly_service_of_entry(r);
-            var deleted_entry = _serialize_deleted_entry(r);
+            var deleted_entry_state = _serialize_deleted_entry(r);
 
             return new EntryDetails(
                 r.getLong((int) EntryDetailsFields.id),
                 category,
+                monthly_service,
                 r.getBool((int) EntryDetailsFields.is_visible),
                 EntryTypeHandler.exportDAO(r.getChar((int) EntryDetailsFields.type)),
                 r.getInt((int) EntryDetailsFields.money_amount),
-                r.tryGetInt((int) EntryDetailsFields.money_amount_left),
+                r.tryGetInt((int) EntryDetailsFields.money_amount_spent),
                 r.getDate((int) EntryDetailsFields.date),
                 r.getDateTime((int) EntryDetailsFields.last_change_date),
                 r.getDate((int) EntryDetailsFields.creation_date),
                 r.tryGetDate((int) EntryDetailsFields.finish_date),
+                r.tryGetDate((int) EntryDetailsFields.due_date),
                 r.tryGetString((int) EntryDetailsFields.description),
                 EntryStatusHandler.exportDAO(r.getChar((int) EntryDetailsFields.status)),
-                deleted_entry?.deleted_date,
-                deleted_entry?.status,
-                deleted_entry?.last_status,
-                monthly_service,
-                r.tryGetBool((int) EntryDetailsFields.is_generated_by_system) ?? false,
-                r.tryGetDate((int) EntryDetailsFields.scheduled_due_date),
-                r.tryGetDate((int) EntryDetailsFields.real_due_date),
-                r.getLong((int) EntryDetailsFields.tags_count),
-                0,
-                0
+                deleted_entry_state?.deleted_date,
+                deleted_entry_state?.delete_status,
+                deleted_entry_state?.last_status
             );
         }
 
-        private static DeletedEntry? _serialize_deleted_entry(NpgsqlDataReader r) {
+        private static DeletedEntryState? _serialize_deleted_entry(NpgsqlDataReader r) {
 
-            DeletedEntry? deleted_entry = null;
+            DeletedEntryState? deleted_entry_state = null;
             DateOnly? deletion_date = r.tryGetDate((int) EntryDetailsFields.deletion_date);
             if (deletion_date != null)
-                deleted_entry = new DeletedEntry(
+                deleted_entry_state = new DeletedEntryState(
                     (DateOnly) deletion_date,
                     EntryStatusHandler.exportDAO(r.getChar((int) EntryDetailsFields.last_status)),
                     EntryStatusHandler.exportDAODeleted(r.getChar((int) EntryDetailsFields.deleted_status))
                 );
 
-            return deleted_entry;
+            return deleted_entry_state;
 
         }
 

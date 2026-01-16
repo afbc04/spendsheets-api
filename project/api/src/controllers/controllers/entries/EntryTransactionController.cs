@@ -14,22 +14,9 @@ namespace Controller {
             this.dao = dao;
         }
 
-        /*
-        public async Task<Category?> _Get(long ID) {
-            return await this.dao.Get(ID);
-        }*/
-        
-        /*
-        public async Task<SendingPacket> Get(string _id) {
-
-            return await ControllerHelper.IDIsNumber(_id, async (id) => {
-
-                EntryDetails? entry = await this.dao.Get(id);
-                return entry == null ? new PacketFail(404) : new PacketSuccess(200,entry.ToJson());
-
-            });
-
-        }*/
+        public async Task<EntryTransaction?> _Get(long ID) {
+            return await this.dao.GetTransaction(ID);
+        }
 
         /*
         public async Task<SendingPacket> List(QueriesRequest? query_request) {
@@ -88,16 +75,17 @@ namespace Controller {
 
         }*/
 
-        public async Task<SendingPacket> Create(IDictionary<string,object> entry_data, Category? category) {
+        public async Task<SendingPacket> Create(IDictionary<string,object> entry_data, Category? category, MonthlyServiceSimple? monthly_service) {
 
             try {
 
                 var entry_dto = new EntryTransactionDTO();
 
-                entry_dto.set_money_amount((double) entry_data["money"]);
+                entry_dto.set_money_amount((double) entry_data["actualMoney"]);
 
                 if (entry_data.ContainsKey("categoryId")) entry_dto.set_category(entry_data["categoryId"] != null, category);
-                if (entry_data.ContainsKey("date")) entry_dto.set_date(DateOnly.Parse((string) entry_data["date"]));
+                if (entry_data.ContainsKey("monthlyServiceId")) entry_dto.set_monthly_service(entry_data["monthlyServiceId"] != null, monthly_service);
+                if (entry_data.ContainsKey("date")) entry_dto.set_date((DateOnly) entry_data["date"]);
                 if (entry_data.ContainsKey("description")) entry_dto.set_description((string?) entry_data["description"]);
                 if (entry_data.ContainsKey("visible")) entry_dto.set_visible((bool) entry_data["visible"]);
                 if (entry_data.ContainsKey("status")) entry_dto.set_status((string) entry_data["status"]);
@@ -107,7 +95,7 @@ namespace Controller {
 
                 if (id != null) {
                     new_entry.ID = (long) id;
-                    return new PacketSuccess(201,new EntryDetails(new_entry,category,0,0).ToJson());
+                    return new PacketSuccess(201,new EntryDetails(new_entry,category,monthly_service).ToJson());
                 }
                 else
                     return new PacketFail(422,"Error while inserting entry into database");
@@ -140,78 +128,86 @@ namespace Controller {
 
             });
 
-        }
-
-        public async Task<SendingPacket> Update(IDictionary<string,object> category_data, string _id) {
-
-            return await ControllerHelper.IDIsNumber(_id, async (id) => {
-
-                Category? category = await this.dao.Get(id);
-                
-                if (category == null)
-                    return new PacketFail(404);
-                else {
-                    
-                    try {
-
-                        var category_dto = new CategoryDTO(id);
-
-                        category_dto.set_name((string) category_data["name"]);
-                        if (category_data.ContainsKey("description")) category_dto.set_description((string?) category_data["description"]);
-
-                        var updated_category = category_dto.extract();
-
-                        if (await this.dao.Update(updated_category))
-                            return new PacketSuccess(200,updated_category.to_json());
-                        else
-                            return new PacketFail(422,"Error while updating category of database");
-
-                    }
-                    catch (CategoryDTOException ex) {
-                        return new PacketFail(417,ex.message);
-                    }
-
-                }
-
-            });
-
-        }
-
-        public async Task<SendingPacket> Patch(IDictionary<string,object> category_data, string _id) {
-
-            return await ControllerHelper.IDIsNumber(_id, async (id) => {
-
-                Category? category = await this.dao.Get(id);
-                
-                if (category == null)
-                    return new PacketFail(404);
-                else {
-                    
-                    try {
-
-                        var category_dto = new CategoryDTO(category);
-
-                        if (category_data.ContainsKey("name")) category_dto.set_name((string) category_data["name"]);
-                        if (category_data.ContainsKey("description")) category_dto.set_description((string?) category_data["description"]);
-
-                        var updated_category = category_dto.extract();
-
-                        if (await this.dao.Update(updated_category))
-                            return new PacketSuccess(200,updated_category.to_json());
-                        else
-                            return new PacketFail(422,"Error while updating category of database");
-
-                    }
-                    catch (CategoryDTOException ex) {
-                        return new PacketFail(417,ex.message);
-                    }
-
-                }
-
-            });
-
         }*/
 
+        public async Task<SendingPacket> Update(IDictionary<string,object> entry_data, long id, Category? category, MonthlyServiceSimple? monthly_service) {
+
+            EntryTransaction? entry = await _Get(id);
+                
+            if (entry == null)
+                return new PacketFail(404);
+            else {
+                    
+                try {
+
+                    var entry_dto = new EntryTransactionDTO(id);
+
+                    entry_dto.set_money_amount((double) entry_data["actualMoney"]);
+
+                    if (entry_data.ContainsKey("categoryId")) entry_dto.set_category(entry_data["categoryId"] != null, category);
+                    if (entry_data.ContainsKey("monthlyServiceId")) entry_dto.set_monthly_service(entry_data["monthlyServiceId"] != null, monthly_service);
+                    if (entry_data.ContainsKey("date")) entry_dto.set_date((DateOnly) entry_data["date"]);
+                    if (entry_data.ContainsKey("description")) entry_dto.set_description((string?) entry_data["description"]);
+                    if (entry_data.ContainsKey("visible")) entry_dto.set_visible((bool) entry_data["visible"]);
+                    if (entry_data.ContainsKey("status")) entry_dto.set_status((string) entry_data["status"]);
+
+                    var updated_entry = entry_dto.extract();
+
+                    if (await this.dao.Update(updated_entry)) {
+                        var entry_details = await this.dao.GetDetailed(id);
+                        return entry_details != null ? 
+                            new PacketSuccess(200,entry_details!.ToJson())
+                            : new PacketFail(422,"Entry was updated, but couldn't get entry's information from database");
+                    } else
+                        return new PacketFail(422,"Error while updating entry of database");
+
+                }
+                catch (EntryTransactionDTOException ex) {
+                    return new PacketFail(417,ex.message);
+                }
+
+            }
+
+        }
+
+        public async Task<SendingPacket> Patch(IDictionary<string,object> entry_data, long id, Category? category, MonthlyServiceSimple? monthly_service) {
+
+            EntryTransaction? entry = await _Get(id);
+                
+            if (entry == null)
+                return new PacketFail(404);
+            else {
+                    
+                try {
+
+                    var entry_dto = new EntryTransactionDTO(entry);
+
+                    if (entry_data.ContainsKey("actualMoney")) entry_dto.set_money_amount((double) entry_data["actualMoney"]);
+                    if (entry_data.ContainsKey("categoryId")) entry_dto.set_category(entry_data["categoryId"] != null, category);
+                    if (entry_data.ContainsKey("monthlyServiceId")) entry_dto.set_monthly_service(entry_data["monthlyServiceId"] != null, monthly_service);
+                    if (entry_data.ContainsKey("date")) entry_dto.set_date((DateOnly) entry_data["date"]);
+                    if (entry_data.ContainsKey("description")) entry_dto.set_description((string?) entry_data["description"]);
+                    if (entry_data.ContainsKey("visible")) entry_dto.set_visible((bool) entry_data["visible"]);
+                    if (entry_data.ContainsKey("status")) entry_dto.set_status((string) entry_data["status"]);
+
+                    var updated_entry = entry_dto.extract();
+
+                    if (await this.dao.Update(updated_entry)) {
+                        var entry_details = await this.dao.GetDetailed(id);
+                        return entry_details != null ? 
+                            new PacketSuccess(200,entry_details!.ToJson())
+                            : new PacketFail(422,"Entry was updated, but couldn't get entry's information from database");
+                    } else
+                        return new PacketFail(422,"Error while updating entry of database");
+
+                }
+                catch (EntryTransactionDTOException ex) {
+                    return new PacketFail(417,ex.message);
+                }
+
+            }
+
+        }
 
     }
 

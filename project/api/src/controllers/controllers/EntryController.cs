@@ -19,26 +19,31 @@ namespace Controller {
             this.transactions_controller = new EntryTransactionController(this.dao);
         }
 
-        /*
-        public async Task<Entry?> _Get(long ID) {
-            return await this.dao.Get(ID);
-        }*/
+        // FIXME: add other types
+        public async Task<Entry?> _Get(long ID,EntryType type) {
+            return type switch {
+                EntryType.Transaction => await this.transactions_controller._Get(ID),
+                EntryType.Commitment => await this.transactions_controller._Get(ID),
+                EntryType.Saving => await this.transactions_controller._Get(ID),
+                _ => null
+            };
+        }
 
         public async Task<bool> _Contains(long ID) {
             return await this.dao.Contains(ID);
         }
-        
-        public async Task<SendingPacket> Get(string _id) {
-            //return await this.dao.Get(_id);
 
-            
+        public async Task<EntryType?> _GetType(long ID) {
+            return await this.dao.GetType(ID);
+        }
+        
+        public async Task<SendingPacket> Get(string _id) {          
             return await ControllerHelper.IDIsNumber(_id, async (id) => {
 
                 EntryDetails? Entry = await this.dao.GetDetailed(id);
                 return Entry == null ? new PacketFail(404) : new PacketSuccess(200,Entry.ToJson());
 
             });
-
         }
 
         /*
@@ -98,84 +103,98 @@ namespace Controller {
 
         }*/
 
-        public async Task<SendingPacket> Create(IDictionary<string,object> entry_data, Category? category) {
+        public async Task<SendingPacket> Create(IDictionary<string,object> entry_data, Category? category, MonthlyServiceSimple? monthly_service) {
 
-            return await this.transactions_controller.Create(entry_data,category);
-
-            /*
             try {
+                
+                var entry_extraction = new EntryExtractionDTO(entry_data,true,null);
+                var final_entry_data = entry_extraction.getData();
 
-                var Entry_dto = new EntryDTO();
+                return entry_extraction.getType() switch {
+                    EntryType.Transaction => await this.transactions_controller.Create(entry_data,category,monthly_service),
+                    _ => new PacketFail(501)
+                };
 
-                Entry_dto.set_name((string) Entry_data["name"]);
-                if (Entry_data.ContainsKey("description")) Entry_dto.set_description((string?) Entry_data["description"]);
-
-                var new_Entry = Entry_dto.extract();
-                long? id = await this.dao.Create(new_Entry);
-
-                if (id != null) {
-                    new_Entry.ID = (long) id;
-                    return new PacketSuccess(201,new_Entry.to_json());
-                }
-                else
-                    return new PacketFail(422,"Error while inserting Entry into database");
 
             }
-            catch (EntryDTOException ex) {
+            catch (EntryExtractionDTOException ex) {
                 return new PacketFail(417,ex.message);
-            }*/
+            }
 
         }
 
-        /*
         public async Task<SendingPacket> Delete(string _id) {
-
             return await ControllerHelper.IDIsNumber(_id, async (id) => {
 
-                Entry? Entry = await this.dao.Get(id);
+                EntryDetails? entry = await this.dao.GetDetailed(id);
                 
-                if (Entry == null)
+                if (entry == null)
                     return new PacketFail(404);
                 else {
                     
                     if (await this.dao.Delete(id)) {
-                        return new PacketSuccess(200,Entry.to_json());
+                        return new PacketSuccess(200,entry.ToJson());
                     }
                     else
-                        return new PacketFail(422,"Error while deleting Entry from database");
+                        return new PacketFail(422,"Error while deleting entry from database");
 
                 }
 
             });
-
         }
 
-        public async Task<SendingPacket> Update(IDictionary<string,object> Entry_data, string _id) {
+        public async Task<SendingPacket> Update(IDictionary<string,object> entry_data, string _id, Category? category, MonthlyServiceSimple? monthly_service) {
 
             return await ControllerHelper.IDIsNumber(_id, async (id) => {
 
-                Entry? Entry = await this.dao.Get(id);
-                
-                if (Entry == null)
+                EntryType? entry_type = await this.dao.GetType(id);
+                if (entry_type == null)
                     return new PacketFail(404);
                 else {
-                    
+
                     try {
+                        
+                        var entry_extraction = new EntryExtractionDTO(entry_data,true,entry_type);
+                        var final_entry_data = entry_extraction.getData();
 
-                        var Entry_dto = new EntryDTO(id);
+                        return entry_extraction.getType() switch {
+                            EntryType.Transaction => await this.transactions_controller.Update(entry_data,id,category,monthly_service),
+                            _ => new PacketFail(501)
+                        };
 
-                        Entry_dto.set_name((string) Entry_data["name"]);
-                        if (Entry_data.ContainsKey("description")) Entry_dto.set_description((string?) Entry_data["description"]);
-
-                        var updated_Entry = Entry_dto.extract();
-
-                        if (await this.dao.Update(updated_Entry))
-                            return new PacketSuccess(200,updated_Entry.to_json());
-                        else
-                            return new PacketFail(422,"Error while updating Entry of database");
 
                     }
-                    catch (EntryDTOException ex) {
+                    catch (EntryExtractionDTOException ex) {
+                        return new PacketFail(417,ex.message);
+                    }
+
+                }
+            });
+
+        }
+
+        public async Task<SendingPacket> Patch(IDictionary<string,object> entry_data, string _id, Category? category, MonthlyServiceSimple? monthly_service) {
+
+            return await ControllerHelper.IDIsNumber(_id, async (id) => {
+
+                EntryType? entry_type = await this.dao.GetType(id);
+                if (entry_type == null)
+                    return new PacketFail(404);
+                else {
+
+                    try {
+                        
+                        var entry_extraction = new EntryExtractionDTO(entry_data,false,entry_type);
+                        var final_entry_data = entry_extraction.getData();
+
+                        return entry_extraction.getType() switch {
+                            EntryType.Transaction => await this.transactions_controller.Patch(entry_data,id,category,monthly_service),
+                            _ => new PacketFail(501)
+                        };
+
+
+                    }
+                    catch (EntryExtractionDTOException ex) {
                         return new PacketFail(417,ex.message);
                     }
 
@@ -184,42 +203,6 @@ namespace Controller {
             });
 
         }
-
-        public async Task<SendingPacket> Patch(IDictionary<string,object> Entry_data, string _id) {
-
-            return await ControllerHelper.IDIsNumber(_id, async (id) => {
-
-                Entry? Entry = await this.dao.Get(id);
-                
-                if (Entry == null)
-                    return new PacketFail(404);
-                else {
-                    
-                    try {
-
-                        var Entry_dto = new EntryDTO(Entry);
-
-                        if (Entry_data.ContainsKey("name")) Entry_dto.set_name((string) Entry_data["name"]);
-                        if (Entry_data.ContainsKey("description")) Entry_dto.set_description((string?) Entry_data["description"]);
-
-                        var updated_Entry = Entry_dto.extract();
-
-                        if (await this.dao.Update(updated_Entry))
-                            return new PacketSuccess(200,updated_Entry.to_json());
-                        else
-                            return new PacketFail(422,"Error while updating Entry of database");
-
-                    }
-                    catch (EntryDTOException ex) {
-                        return new PacketFail(417,ex.message);
-                    }
-
-                }
-
-            });
-
-        }*/
-
 
     }
 

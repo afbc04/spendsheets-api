@@ -1,11 +1,14 @@
 public static class EntryTypeHandler {
 
+    public static readonly IReadOnlyList<string> types = new List<string> { "transaction", "commitment", "savings" };
+
+
     public static string Get(EntryType type) {
 
         return type switch {
             EntryType.Transaction => "transaction",
             EntryType.Commitment => "commitment",
-            EntryType.Saving => "saving",
+            EntryType.Saving => "savings",
             _ => "???"
         };
 
@@ -16,7 +19,7 @@ public static class EntryTypeHandler {
         return type.ToLower() switch {
             "transaction" => EntryType.Transaction,
             "commitment" => EntryType.Commitment,
-            "saving" => EntryType.Saving,
+            "savings" => EntryType.Saving,
             _ => null
         };
 

@@ -56,33 +56,34 @@ public static class EntryRouters {
 
         });
 
-        /*
-        // DELETE /v1.0/monthlyServices/:id
+        // DELETE /v1.0/entries/:id
         app.MapDelete("{id}", async (HttpRequest request, string id) => {
 
-            return await PacketUtils.validate_and_reply(request, "monthly-service/delete", async (packet) => {
-                return PacketUtils.send_packet(await api.MonthlyService.Delete(packet.token!,id));
+            return await PacketUtils.validate_and_reply(request, "entry/delete", async (packet) => {
+                return PacketUtils.send_packet(await api.Entry.Delete(packet.token!,id));
             });
 
         });
 
-        // PATCH /v1.0/monthlyServices/:id
+        // PATCH /v1.0/entries/:id
         app.MapPatch("{id}", async (HttpRequest request, string id) => {
 
-            return await PacketUtils.validate_and_reply(request, "monthly-service/update-partial", async (packet) => {
-                return PacketUtils.send_packet(await api.MonthlyService.Patch(packet.body!,packet.token!,id));
+            return await PacketUtils.validate_and_reply(request, "entry/update-partial", async (packet) => {
+                return PacketUtils.send_packet(await api.Entry.Patch(packet.body!,packet.token!,id));
             });
 
         });
 
-        // PUT /v1.0/monthlyServices/:id
+        // PUT /v1.0/entries/:id
         app.MapPut("{id}", async (HttpRequest request, string id) => {
 
-            return await PacketUtils.validate_and_reply(request, "monthly-service/update-full", async (packet) => {
-                return PacketUtils.send_packet(await api.MonthlyService.Update(packet.body!,packet.token!,id));
+            return await PacketUtils.validate_and_reply(request, "entry/update-full", async (packet) => {
+                return PacketUtils.send_packet(await api.Entry.Update(packet.body!,packet.token!,id));
             });
 
-        });*/
+        });
+
+        app.EntryTagsRoutersMapping();
 
         return group;
 

@@ -12,7 +12,6 @@ public static class v1Routers {
         api.CategoryRoutersMapping();
         api.MonthlyServiceRoutersMapping();
         api.EntryRoutersMapping();
-        api.EntryTagsRoutersMapping();
 
     }
 

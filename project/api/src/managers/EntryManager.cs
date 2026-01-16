@@ -57,6 +57,7 @@ public class EntryManager {
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
+                
                 using (await category.Lock.ReaderLockAsync())
                 using (await monthly_service.Lock.ReaderLockAsync())
                 using (await entry.Lock.WriterLockAsync()) {
@@ -65,7 +66,11 @@ public class EntryManager {
                     if (request_data.ContainsKey("categoryId"))
                         category = await this.category._Get((long) request_data["categoryId"]);
 
-                    return await entry.Create(request_data,category);
+                    MonthlyServiceSimple? monthly_service = null;
+                    if (request_data.ContainsKey("monthlyServiceId"))
+                        monthly_service = await this.monthly_service._Get((long) request_data["monthlyServiceId"]);
+
+                    return await entry.Create(request_data,category,monthly_service);
 
                 }
             });
@@ -82,14 +87,14 @@ public class EntryManager {
             });
         
     }
-    /*
+    
     public async Task<SendingPacket> Delete(string extracted_token, string id) {
 
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
-                using (await monthly_service.Lock.WriterLockAsync())
-                    return await monthly_service.Delete(id);
+                using (await entry.Lock.WriterLockAsync())
+                    return await entry.Delete(id);
             });
 
     }
@@ -99,14 +104,20 @@ public class EntryManager {
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
+                
                 using (await category.Lock.ReaderLockAsync())
-                using (await monthly_service.Lock.WriterLockAsync()) {
+                using (await monthly_service.Lock.ReaderLockAsync())
+                using (await entry.Lock.WriterLockAsync()) {
 
                     Category? category = null;
-                    if (request_data.ContainsKey("categoryRelatedId") && request_data["categoryRelatedId"] != null)
-                        category = await this.category._Get((long) request_data["categoryRelatedId"]);
+                    if (request_data.ContainsKey("categoryId"))
+                        category = await this.category._Get((long) request_data["categoryId"]);
 
-                    return await monthly_service.Patch(request_data,id,category);
+                    MonthlyServiceSimple? monthly_service = null;
+                    if (request_data.ContainsKey("monthlyServiceId"))
+                        monthly_service = await this.monthly_service._Get((long) request_data["monthlyServiceId"]);
+
+                    return await entry.Patch(request_data,id,category,monthly_service);
 
                 }
             });
@@ -118,18 +129,24 @@ public class EntryManager {
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
+                
                 using (await category.Lock.ReaderLockAsync())
-                using (await monthly_service.Lock.WriterLockAsync()) {
+                using (await monthly_service.Lock.ReaderLockAsync())
+                using (await entry.Lock.WriterLockAsync()) {
 
                     Category? category = null;
-                    if (request_data.ContainsKey("categoryRelatedId") && request_data["categoryRelatedId"] != null)
-                        category = await this.category._Get((long) request_data["categoryRelatedId"]);
+                    if (request_data.ContainsKey("categoryId"))
+                        category = await this.category._Get((long) request_data["categoryId"]);
 
-                    return await monthly_service.Update(request_data,id,category);
+                    MonthlyServiceSimple? monthly_service = null;
+                    if (request_data.ContainsKey("monthlyServiceId"))
+                        monthly_service = await this.monthly_service._Get((long) request_data["monthlyServiceId"]);
+
+                    return await entry.Update(request_data,id,category,monthly_service);
 
                 }
             });
 
-    }*/
+    }
 
 }

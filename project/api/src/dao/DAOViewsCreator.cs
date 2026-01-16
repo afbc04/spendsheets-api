@@ -28,50 +28,36 @@ namespace DAO {
                     c.name                AS categoryName,
                     c.description         AS categoryDescription,
 
-                    e.isVisible,
-                    e.type,
-                    e.moneyAmount,
-                    e.moneyAmountLeft,
-                    e.date,
-                    e.lastChangeDate,
-                    e.creationDate,
-                    e.finishDate,
-                    e.description,
-                    e.status,
-                    de.deletionDate,
-                    de.deletedStatus,
-                    de.lastStatus,
-
-                    ce.monthlyServiceId     AS monthlyServiceId,
+                    e.monthlyServiceId      AS monthlyServiceId,
                     ms.name                 AS monthlyServiceName,
                     ms.description          AS monthlyServiceDescription,
                     ms.isActive             AS monthlyServiceActive,
 
-                    ce.isGeneratedBySystem,
-                    ce.scheduledDueDate,
-                    ce.realDueDate,
-
-                    COALESCE(et.tagsCount, 0) AS tagsCount
+                    e.isVisible,
+                    e.type,
+                    e.moneyAmount,
+                    e.moneyAmountSpent,
+                    e.date,
+                    e.lastChangeDate,
+                    e.creationDate,
+                    e.finishDate,
+                    e.dueDate,
+                    e.description,
+                    e.status,
+                    de.deletionDate,
+                    de.deletedStatus,
+                    de.lastStatus
 
                   FROM Entries AS e
 
                   LEFT JOIN Categories AS c
                     ON e.categoryId = c.id
 
-                  LEFT JOIN DeletedEntries AS de
-                    ON e.id = de.id
-
-                  LEFT JOIN CommitmentEntries AS ce
-                    ON e.id = ce.id
-
                   LEFT JOIN MonthlyServices AS ms
-                    ON ce.monthlyServiceId = ms.id
-                    
-                  LEFT JOIN (
-                      SELECT entryId, COUNT(*) AS tagsCount
-                      FROM EntryTags
-                      GROUP BY entryId
-                  ) et ON e.id = et.entryId;");
+                    ON e.monthlyServiceId = ms.id
+
+                  LEFT JOIN DeletedEntries AS de
+                    ON e.id = de.id;");
 
         public static async Task EntryTagsByTag() =>
             await DAOUtils.CreateTableOrIndex(@$"

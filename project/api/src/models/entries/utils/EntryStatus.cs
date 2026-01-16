@@ -1,6 +1,33 @@
 public static class EntryStatusHandler {
 
-    public static string Get(DateOnly date, DateOnly? scheduled_date, EntryStatus status, DeletedEntryStatus? deleted_status, int money, int? money_left) {
+    public static EntryStatus? Extract(string status) {
+
+        return status.ToLower() switch {
+            "draft" => EntryStatus.Draft,
+            "ongoing" => EntryStatus.OnGoing,
+            "done" => EntryStatus.Done,
+            "stalled" => EntryStatus.Stalled,
+            "accomplished" => EntryStatus.Accomplished,
+            "deleted" => EntryStatus.Deleted,
+            "cancelled" => EntryStatus.Deleted,
+            "ignored" => EntryStatus.Deleted,
+            _ => null
+        };
+
+    }
+
+    public static DeletedEntryStatus? ExtractDelete(string status) {
+
+        return status.ToLower() switch {
+            "deleted" => DeletedEntryStatus.Deleted,
+            "cancelled" => DeletedEntryStatus.Cancelled,
+            "ignored" => DeletedEntryStatus.Ignored,
+            _ => null
+        };
+
+    }
+
+    public static string Get(DateOnly date, DateOnly? scheduled_date, EntryStatus status, DeletedEntryStatus? deleted_status, int money, int? money_spent) {
 
         if (status == EntryStatus.OnGoing) {
 
@@ -12,12 +39,12 @@ public static class EntryStatusHandler {
             if (scheduled_date != null && scheduled_date < today)
                 return "overdue";
 
-            if (money_left != null) {
+            if (money_spent != null) {
 
-                if (money_left == 0)
+                if (money_spent == money)
                     return "completed";
 
-                if (money_left >= money)
+                if (money_spent == 0)
                     return "pending";
 
             }

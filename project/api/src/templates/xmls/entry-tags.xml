@@ -8,18 +8,7 @@
     <template id="create">
         <auth required="true"/>
         <body required="true">
-            <i name="type" required="true"/>
-            <i name="categoryId" datatype="integer" null="true" />
-            <i name="money" required="true" datatype="float" />
-            <i name="date" datatype="date" />
-
-            <!--i name="beginDate" datatype="date" />
-            <i name="scheduledDueDate" datatype="date" />
-
-            <i name="tagIds" list="true" datatype="integer"/-->
-            <i name="description" null="true" />
-            <i name="visible" datatype="boolean" />
-            <i name="status" />
+            <i name="tags" required="true" list="true" datatype="integer"/>
         </body>
     </template>
 
@@ -28,10 +17,6 @@
         <query>
             <q name="ids" />
         </query>
-    </template>
-
-    <template id="get">
-        <auth />
     </template>
 
     <template id="put">

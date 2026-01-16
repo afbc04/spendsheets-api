@@ -32,7 +32,7 @@ public class EntryTagsManager {
         
     }
 
-    public async Task<SendingPacket> Clear(string? extracted_token, string entry_id) {
+    public async Task<SendingPacket> Clear(string? extracted_token, string entry_id, QueriesRequest? query) {
         
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
@@ -40,45 +40,24 @@ public class EntryTagsManager {
                 using (await entry.Lock.ReaderLockAsync())
                     return await ControllerHelper.CheckIfEntryExists(entry,entry_id,async (entryID) => {
                         using (await entry_tag.Lock.WriterLockAsync())
-                            return await entry_tag.Clear(entryID);
+                            return await entry_tag.Clear(query,entryID);
                     });
             });
         
     }
 
-    /*
-    public async Task<SendingPacket> Create(string extracted_token, IDictionary<string,object> request_data) {
+    public async Task<SendingPacket> Batch(string extracted_token, IDictionary<string,object> request_data, string entry_id) {
 
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenWriter(config,token,extracted_token,async (access_token) => {
-                using (await category.Lock.ReaderLockAsync())
-                using (await monthly_service.Lock.ReaderLockAsync())
-                using (await entry.Lock.WriterLockAsync()) {
-
-                    Category? category = null;
-                    if (request_data.ContainsKey("categoryId"))
-                        category = await this.category._Get((long) request_data["categoryId"]);
-
-                    return await entry.Create(request_data,category);
-
-                }
-            });
-
-    }*/
-
-    public async Task<SendingPacket> Get(string? extracted_token, string entry_id, string tag_id) {
-        
-        using (await config.Lock.ReaderLockAsync())
-        using (await token.Lock.ReaderLockAsync())
-            return await ManagerHelper.WithTokenReaderPublic(config,token,extracted_token,async (access_token) => {
                 using (await entry.Lock.ReaderLockAsync())
                     return await ControllerHelper.CheckIfEntryExists(entry,entry_id,async (entryID) => {
-                        using (await entry_tag.Lock.ReaderLockAsync())
-                            return await entry_tag.Get(entryID,tag_id);
+                        using (await entry_tag.Lock.WriterLockAsync())
+                            return await entry_tag.Batch(request_data,entryID);
                     });
             });
-        
+
     }
     
     public async Task<SendingPacket> Delete(string extracted_token, string entry_id, string tag_id) {

@@ -1,55 +1,91 @@
 public abstract class Entry {
 
     public long ID {set; get;}
-    public long? category_ID {set; get;}
-    public bool is_visible {set; get;}
-    public EntryType type {set; get;}
+    public string? description {set; get;}
     public int money {set; get;}
-    public int? money_left {set; get;}
+    public int? money_spent {set; get;}
+    public bool is_visible {set; get;}
+    public long? category_ID {set; get;}
+    public long? monthly_service_ID {set; get;}
     public DateTime last_change_date {set; get;}
     public DateOnly creation_date {set; get;}
     public DateOnly date {set; get;}
     public DateOnly? finish_date {set; get;}
-    public string? description {set; get;}
+    public DateOnly? due_date {set; get;}
     public EntryStatus status {set; get;}
-    public DeletedEntry? deleted_entry {set; get;}
-    public bool is_deleted => this.deleted_entry != null;
+    public EntryType type {set; get;}
+    public DeletedEntryState? deleted_entry_state {set; get;}
+    
+    public bool is_deleted => this.deleted_entry_state != null;
+    public bool switched_deletion_mode;
+
+    public Entry(long ID, EntryType type) {
+
+        DateOnly current_date = DateOnly.FromDateTime(DateTime.Today);
+
+        this.ID = ID;
+        this.description = null;
+        this.money = 0;
+        this.money_spent = null;
+        this.is_visible = true;
+        this.category_ID = null;
+        this.monthly_service_ID = null;
+        this.last_change_date = DateTime.UtcNow;
+        this.creation_date = current_date;
+        this.date = current_date;
+        this.finish_date = null;
+        this.due_date = null;
+        this.status = EntryStatus.Draft;
+        this.type = type;
+        this.deleted_entry_state = null;
+
+        this.switched_deletion_mode = false;
+
+    }
 
     public Entry(long ID, bool is_visible, EntryType type, int money) {
 
         DateOnly current_date = DateOnly.FromDateTime(DateTime.Today);
 
         this.ID = ID;
-        this.category_ID = null;
-        this.is_visible = is_visible;
-        this.type = type;
+        this.description = null;
         this.money = money;
-        this.money_left = null;
+        this.money_spent = null;
+        this.is_visible = is_visible;
+        this.category_ID = null;
+        this.monthly_service_ID = null;
         this.last_change_date = DateTime.UtcNow;
         this.creation_date = current_date;
         this.date = current_date;
         this.finish_date = null;
-        this.description = null;
+        this.due_date = null;
         this.status = EntryStatus.Draft;
-        this.deleted_entry = null;
+        this.type = type;
+        this.deleted_entry_state = null;
+
+        this.switched_deletion_mode = false;
 
     }
 
-    public Entry(long ID, long? category_id, bool is_visible, EntryType type, int money, int? money_left, DateTime last_change_date, DateOnly creation_date, DateOnly date, DateOnly? finish_date, string? description, EntryStatus status, DeletedEntry? deleted_entry) {
+    public Entry(long ID, long? category_id, long? monthly_service_id, bool is_visible, EntryType type, int money, int? money_spent, DateTime last_change_date, DateOnly creation_date, DateOnly date, DateOnly? finish_date, DateOnly? due_date, string? description, EntryStatus status, DeletedEntryState? deleted_entry_state) {
 
         this.ID = ID;
-        this.category_ID = category_id;
-        this.is_visible = is_visible;
-        this.type = type;
+        this.description = description;
         this.money = money;
-        this.money_left = money_left;
+        this.money_spent = money_spent;
+        this.is_visible = is_visible;
+        this.category_ID = category_id;
+        this.monthly_service_ID = monthly_service_id;
         this.last_change_date = last_change_date;
         this.creation_date = creation_date;
         this.date = date;
         this.finish_date = finish_date;
-        this.description = description;
+        this.due_date = due_date;
         this.status = status;
-        this.deleted_entry = deleted_entry;
+        this.type = type;
+        this.deleted_entry_state = deleted_entry_state;
+
+        this.switched_deletion_mode = false;
 
     }
 
@@ -62,89 +98,87 @@ public abstract class Entry {
     }
 
     public void _undoDelete() {
-        this.deleted_entry = null;
+
+        if (this.is_deleted)
+            this.switched_deletion_mode = true;
+
+        this.deleted_entry_state = null;
     }
 
     public void _doDelete(DeletedEntryStatus status) {
-        this.deleted_entry = new DeletedEntry(DateOnly.FromDateTime(DateTime.Today),this.status,status);
-    }
 
-    public void setStatusDraft() {
-        this._undoFinish();
-        this._undoDelete();
-        this.status = EntryStatus.Draft;
-    }
+        if (this.is_deleted == false)
+            this.switched_deletion_mode = true;
 
-    public void setStatusOnGoing() {
-        this._undoFinish();
-        this._undoDelete();
-        this.status = EntryStatus.OnGoing;
-    }
-
-    public void setStatusDone() {
-        this._undoDelete();
-        this._doFinish();
-        this.status = EntryStatus.Done;
-    }
-
-    public void setStatusStalled() {
-        this._undoFinish();
-        this._undoDelete();
-        this.status = EntryStatus.Stalled;
-    }
-
-    public void setStatusAccomplished() {
-        this._undoFinish();
-        this._undoDelete();
-        this.status = EntryStatus.Accomplished;
-    }
-
-    public void setStatusDeleted() {
-        this._undoFinish();
-        this._doDelete(DeletedEntryStatus.Deleted);
-        this.status = EntryStatus.Deleted;
-    }
-
-    public void setStatusCancelled() {
-        this._undoFinish();
-        this._doDelete(DeletedEntryStatus.Cancelled);
-        this.status = EntryStatus.Deleted;
-    }
-
-    public void setStatusIgnored() {
-        this._undoFinish();
-        this._doDelete(DeletedEntryStatus.Ignored);
-        this.status = EntryStatus.Deleted;
+        this.deleted_entry_state = new DeletedEntryState(DateOnly.FromDateTime(DateTime.Today),this.status,status);
     }
 
     public void recoverEntry() {
-        this.status = this.deleted_entry!.last_status;
+
+        this.status = this.deleted_entry_state!.last_status;
         
         if (this.status == EntryStatus.Done)
             this._doFinish();
         else
             this._undoFinish();
 
-        this.deleted_entry = null;
-    }
-
-
-    /*
-    public Category(long ID, string name, string? description) {
-
-        this.ID = ID;
-        this.name = name;
-        this.description = description;
+        this.deleted_entry_state = null;
 
     }
 
-    public IDictionary<string,object?> to_json() {
-        return new Dictionary<string,object?> {
-            ["id"] = this.ID,
-            ["name"] = this.name,
-            ["description"] = this.description
-        };
-    }*/
+    public void setStatus(string status) {
 
+        status = status.ToLower();
+        var obtained_status = EntryStatusHandler.Extract(status);
+        var obtained_deleted_status = EntryStatusHandler.ExtractDelete(status);
+
+        switch (obtained_status) {
+
+            case EntryStatus.Draft:
+                setStatusDraft();
+                break;
+
+            case EntryStatus.OnGoing:
+                setStatusOnGoing();
+                break;
+
+            case EntryStatus.Done:
+                setStatusDone();
+                break;
+
+            case EntryStatus.Stalled:
+                setStatusStalled();
+                break;
+
+            case EntryStatus.Accomplished:
+                setStatusAccomplished();
+                break;
+
+            case EntryStatus.Deleted:
+
+                if (obtained_deleted_status == DeletedEntryStatus.Cancelled)
+                    setStatusCancelled();
+                else if (obtained_deleted_status == DeletedEntryStatus.Ignored)
+                    setStatusIgnored();
+                else
+                    setStatusDeleted();
+
+                break;
+
+            default:
+                throw new EntryException("Invalid status provided");
+
+        }
+
+    }
+
+    public abstract void setStatusDraft();
+    public abstract void setStatusOnGoing();
+    public abstract void setStatusDone();
+    public abstract void setStatusStalled();
+    public abstract void setStatusAccomplished();
+    public abstract void setStatusDeleted();
+    public abstract void setStatusCancelled();
+    public abstract void setStatusIgnored();
 
 }

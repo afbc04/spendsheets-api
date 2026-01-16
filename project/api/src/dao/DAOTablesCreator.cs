@@ -56,19 +56,25 @@ namespace DAO {
                 CREATE TABLE IF NOT EXISTS Entries (
                   id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
                   categoryId BIGINT,
+                  monthlyServiceId BIGINT,
                   isVisible BOOLEAN NOT NULL,
                   type CHAR(1) NOT NULL,
                   moneyAmount INTEGER NOT NULL,
-                  moneyAmountLeft INTEGER,
+                  moneyAmountSpent INTEGER,
                   lastChangeDate TIMESTAMP NOT NULL,
                   creationDate DATE NOT NULL,
                   finishDate DATE,
                   date DATE NOT NULL,
+                  dueDate DATE,
                   description VARCHAR({EntryRules.description_length_max}),
                   status CHAR(1) NOT NULL,
                 CONSTRAINT fk_entries_category
                   FOREIGN KEY (categoryId)
                   REFERENCES Categories(id)
+                  ON DELETE SET NULL,
+                CONSTRAINT fk_entries_monthlyservice
+                  FOREIGN KEY (monthlyServiceId)
+                  REFERENCES MonthlyServices(id)
                   ON DELETE SET NULL
                 );");
 
@@ -83,24 +89,6 @@ namespace DAO {
                   FOREIGN KEY (id)
                   REFERENCES Entries(id)
                   ON DELETE CASCADE
-                );");
-
-        public static async Task EntryCommitment() =>
-            await DAOUtils.CreateTableOrIndex(@$"
-                CREATE TABLE IF NOT EXISTS CommitmentEntries (
-                  id BIGINT PRIMARY KEY,
-                  monthlyServiceId BIGINT,
-                  isGeneratedBySystem BOOLEAN NOT NULL,
-                  scheduledDueDate DATE,
-                  realDueDate DATE,
-                CONSTRAINT fk_commitmententries_entry
-                  FOREIGN KEY (id)
-                  REFERENCES Entries(id)
-                  ON DELETE CASCADE,
-                CONSTRAINT fk_commitmententries_monthlyservice
-                  FOREIGN KEY (monthlyServiceId)
-                  REFERENCES MonthlyServices(id)
-                  ON DELETE SET NULL
                 );");
 
           public static async Task EntryTags() =>
