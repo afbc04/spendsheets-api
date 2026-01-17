@@ -58,7 +58,7 @@ public class MonthlyServiceManager {
                 using (await monthly_service.Lock.WriterLockAsync()) {
 
                     Category? category = null;
-                    if (request_data.ContainsKey("categoryRelatedId"))
+                    if (request_data.ContainsKey("categoryRelatedId") && request_data["categoryRelatedId"] != null)
                         category = await this.category._Get((long) request_data["categoryRelatedId"]);
 
                     return await monthly_service.Create(request_data,category);

@@ -8,6 +8,7 @@ public sealed class EntryDetails {
     public EntryType type { get; set; }
     public int money { get; set; }
     public int? money_spent { get; set; }
+    public int money_spent_movements { get; set; }
     public DateOnly date { get; set; }
     public DateTime last_change_date { get; set; }
     public DateOnly creation_date { get; set; }
@@ -29,6 +30,7 @@ public sealed class EntryDetails {
         EntryType type,
         int money,
         int? money_spent,
+        int money_spent_movements,
         DateOnly date,
         DateTime last_change_date,
         DateOnly creation_date,
@@ -48,6 +50,7 @@ public sealed class EntryDetails {
         this.type = type;
         this.money = money;
         this.money_spent = money_spent;
+        this.money_spent_movements = money_spent_movements;
         this.date = date;
         this.last_change_date = last_change_date;
         this.creation_date = creation_date;
@@ -68,6 +71,7 @@ public sealed class EntryDetails {
         this.type = EntryType.Transaction;
         this.money = entry.money;
         this.money_spent = null;
+        this.money_spent_movements = 0;
         this.date = entry.date;
         this.last_change_date = entry.last_change_date;
         this.creation_date = entry.creation_date;
@@ -81,16 +85,60 @@ public sealed class EntryDetails {
         this.last_status = entry.deleted_entry_state?.last_status;
     }
 
-    private decimal? _get_actual_money() {
-        return this.type == EntryType.Transaction ? Money.Format(this.money) : this.money_spent == null ? null : Money.Format((long) this.money_spent);
+    public EntryDetails(EntrySavings entry, Category? category) {
+        this.ID = entry.ID;
+        this.category = category;
+        this.monthly_service = null;
+        this.is_visible = entry.is_visible;
+        this.type = EntryType.Saving;
+        this.money = entry.money;
+        this.money_spent = entry.money_spent;
+        this.money_spent_movements = 0;
+        this.date = entry.date;
+        this.last_change_date = entry.last_change_date;
+        this.creation_date = entry.creation_date;
+        this.finish_date = entry.finish_date;
+        this.due_date = entry.due_date;
+        this.description = entry.description;
+        this.status = entry.status;
+
+        this.deletion_date = entry.deleted_entry_state?.deleted_date;
+        this.deleted_status = entry.deleted_entry_state?.delete_status;
+        this.last_status = entry.deleted_entry_state?.last_status;
+    }
+
+    public EntryDetails(EntryCommitment entry, Category? category, MonthlyServiceSimple? monthly_service) {
+        this.ID = entry.ID;
+        this.category = category;
+        this.monthly_service = monthly_service;
+        this.is_visible = entry.is_visible;
+        this.type = EntryType.Commitment;
+        this.money = entry.money;
+        this.money_spent = null;
+        this.money_spent_movements = (int) entry.money_spent!;
+        this.date = entry.date;
+        this.last_change_date = entry.last_change_date;
+        this.creation_date = entry.creation_date;
+        this.finish_date = entry.finish_date;
+        this.due_date = entry.due_date;
+        this.description = entry.description;
+        this.status = entry.status;
+
+        this.deletion_date = entry.deleted_entry_state?.deleted_date;
+        this.deleted_status = entry.deleted_entry_state?.delete_status;
+        this.last_status = entry.deleted_entry_state?.last_status;
+    }
+
+    private decimal? _get_actual_money(int money_spent) {
+        return this.type == EntryType.Transaction ? Money.Format(this.money) : Money.Format(money_spent);
     }
 
     private decimal? _get_target_money() {
         return this.type == EntryType.Transaction ? null : Money.Format(this.money);
     }
 
-    private decimal? _get_remaining_money() {
-        return this.type == EntryType.Transaction ? null : money_spent != null ? Money.Format((long) (this.money - this.money_spent)) : null;
+    private decimal? _get_remaining_money(int money_spent) {
+        return this.type == EntryType.Transaction ? null : Money.Format((long) (this.money - money_spent));
     }
 
     private Dictionary<string, object?>? _get_monthly_service() {
@@ -114,8 +162,11 @@ public sealed class EntryDetails {
         };
     }
 
-    public IDictionary<string, object?> ToJson() =>
-        new Dictionary<string, object?> {
+    public IDictionary<string, object?> ToJson() {
+
+        int money_spent = this.type == EntryType.Commitment ? this.money_spent_movements : this.money_spent ?? 0;
+
+        return new Dictionary<string, object?> {
             ["id"] = this.ID,
             ["category"] = this.category?.to_json(),
             ["monthlyService"] = this.monthly_service != null ? _get_monthly_service() : null,
@@ -124,8 +175,8 @@ public sealed class EntryDetails {
             ["date"] = this.date,
             ["description"] = this.description,
             ["targetMoney"] = _get_target_money(),
-            ["actualMoney"] = _get_actual_money(),
-            ["remainingMoney"] = _get_remaining_money(),
+            ["actualMoney"] = _get_actual_money(money_spent),
+            ["remainingMoney"] = _get_remaining_money(money_spent),
             ["lastChangeDate"] = Utils.convert_to_datetime(this.last_change_date),
             ["creationDate"] = this.creation_date,
             ["finishDate"] = this.finish_date,
@@ -136,8 +187,9 @@ public sealed class EntryDetails {
             ["pending"] = this.money_spent != null ? this.money_spent == 0 : null,
             ["deleted"] = this.status == EntryStatus.Deleted,
             ["deletedDate"] = this.deletion_date,
-            ["status"] = EntryStatusHandler.Get(this.date,this.due_date,this.status,this.deleted_status,this.money,this.money_spent),
+            ["status"] = EntryStatusHandler.Get(this.date,this.due_date,this.status,this.deleted_status,this.money,money_spent),
             ["_links"] = _get_links()
         };
+    }
 
 }

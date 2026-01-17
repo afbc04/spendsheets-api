@@ -24,6 +24,49 @@ namespace DAO {
             );
         }
 
+        public static EntrySavings serialize_savings(NpgsqlDataReader r) {
+
+            var deleted_entry_state = _serialize_deleted_entry(r);
+
+            return new EntrySavings(
+                r.getLong((int) EntryDetailsFields.id),
+                r.tryGetLong((int) EntryDetailsFields.category_id),
+                r.getBool((int) EntryDetailsFields.is_visible),
+                r.getInt((int) EntryDetailsFields.money_amount),
+                r.tryGetInt((int) EntryDetailsFields.money_amount_spent),
+                r.getDate((int) EntryDetailsFields.date),
+                r.getDateTime((int) EntryDetailsFields.last_change_date),
+                r.getDate((int) EntryDetailsFields.creation_date),
+                r.tryGetDate((int) EntryDetailsFields.finish_date),
+                r.tryGetDate((int) EntryDetailsFields.due_date),
+                r.tryGetString((int) EntryDetailsFields.description),
+                EntryStatusHandler.exportDAO(r.getChar((int) EntryDetailsFields.status)),
+                deleted_entry_state
+            );
+        }
+
+        public static EntryCommitment serialize_commitment(NpgsqlDataReader r) {
+
+            var deleted_entry_state = _serialize_deleted_entry(r);
+
+            return new EntryCommitment(
+                r.getLong((int) EntryDetailsFields.id),
+                r.tryGetLong((int) EntryDetailsFields.category_id),
+                r.tryGetLong((int) EntryDetailsFields.monthly_service_id),
+                r.getBool((int) EntryDetailsFields.is_visible),
+                r.getInt((int) EntryDetailsFields.money_amount),
+                r.getInt((int) EntryDetailsFields.money_amount_spent_movements),
+                r.getDate((int) EntryDetailsFields.date),
+                r.getDateTime((int) EntryDetailsFields.last_change_date),
+                r.getDate((int) EntryDetailsFields.creation_date),
+                r.tryGetDate((int) EntryDetailsFields.finish_date),
+                r.tryGetDate((int) EntryDetailsFields.due_date),
+                r.tryGetString((int) EntryDetailsFields.description),
+                EntryStatusHandler.exportDAO(r.getChar((int) EntryDetailsFields.status)),
+                deleted_entry_state
+            );
+        }
+
         public static EntryDetails serialize_detailed(NpgsqlDataReader r) {
 
             var category = _serialize_category_of_entry(r);
@@ -38,6 +81,7 @@ namespace DAO {
                 EntryTypeHandler.exportDAO(r.getChar((int) EntryDetailsFields.type)),
                 r.getInt((int) EntryDetailsFields.money_amount),
                 r.tryGetInt((int) EntryDetailsFields.money_amount_spent),
+                r.getInt((int) EntryDetailsFields.money_amount_spent_movements),
                 r.getDate((int) EntryDetailsFields.date),
                 r.getDateTime((int) EntryDetailsFields.last_change_date),
                 r.getDate((int) EntryDetailsFields.creation_date),

@@ -66,6 +66,8 @@
             <i name="description" null="true" />
             <i name="visible" datatype="boolean" />
             <i name="status" />
+            <i name="deleted" datatype="boolean" />
+            <i name="draft" datatype="boolean" />
         </body>
     </template>
 

@@ -108,6 +108,33 @@ namespace DAO {
                   ON DELETE CASCADE
                 );");
 
+          public static async Task EntryNotes() =>
+            await DAOUtils.CreateTableOrIndex(@$"
+                CREATE TABLE IF NOT EXISTS EntryNotes (
+                  id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
+                  entryId BIGINT NOT NULL,
+                  note VARCHAR({EntryRules.note_length_max}) NOT NULL,
+                  changeDate DATE NOT NULL,
+                CONSTRAINT fk_entrynotes_entry
+                  FOREIGN KEY (entryId)
+                  REFERENCES Entries(id)
+                  ON DELETE CASCADE
+                );");
+
+          public static async Task EntryMovements() =>
+            await DAOUtils.CreateTableOrIndex(@$"
+                CREATE TABLE IF NOT EXISTS EntryMovements (
+                  id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
+                  entryId BIGINT NOT NULL,
+                  money INTEGER NOT NULL,
+                  comment VARCHAR({EntryRules.movement_comment_length_max}),
+                  date DATE NOT NULL,
+                CONSTRAINT fk_entrymovements_entry
+                  FOREIGN KEY (entryId)
+                  REFERENCES Entries(id)
+                  ON DELETE CASCADE
+                );");
+
     }
 
 }

@@ -43,8 +43,12 @@ namespace DAO {
 
             await DAOTableCreator.EntryTags();
             await DAOViewCreator.EntryTagsByTag();
+
+            await DAOTableCreator.EntryNotes();
+            await DAOTableCreator.EntryMovements();
             
             await DAOViewCreator.EntryDetails();
+            await DAOViewCreator.EntryListing();
 
         }
 

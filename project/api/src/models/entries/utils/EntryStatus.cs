@@ -41,7 +41,7 @@ public static class EntryStatusHandler {
 
             if (money_spent != null) {
 
-                if (money_spent == money)
+                if (Math.Abs((int) money_spent) >= Math.Abs(money))
                     return "completed";
 
                 if (money_spent == 0)

@@ -9,15 +9,14 @@ public static class EntryRouters {
         var app = group.MapGroup("/entries").AllowAnonymous();
         var api = API.GetAPI();
 
-        /*
-        // GET /v1.0/monthlyServices
+        // GET /v1.0/entries
         app.MapGet("", async (HttpRequest request) => {
 
             return await PacketUtils.validate_and_reply(request, "monthly-service/list", async (packet) => {
-                return PacketUtils.send_packet(await api.MonthlyService.List(packet.token!,packet.queries));
+                return PacketUtils.send_packet(await api.Entry.List(packet.token!,packet.queries));
             });
 
-        });*/
+        });
 
         // POST /v1.0/entries
         app.MapPost("", async (HttpRequest request) => {
@@ -84,6 +83,8 @@ public static class EntryRouters {
         });
 
         app.EntryTagsRoutersMapping();
+        app.EntryNotesRoutersMapping();
+        app.EntryMovementsRoutersMapping();
 
         return group;
 

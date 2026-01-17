@@ -27,4 +27,7 @@ public static class SendErrors {
     public static SendingPacket EntryDoesNotExists() =>
         new PacketFail(404,"Entry does not exists");
 
+    public static SendingPacket EntryDoesNotSupportMovements() =>
+        new PacketFail(403,"Entry does not support movements");
+
 }

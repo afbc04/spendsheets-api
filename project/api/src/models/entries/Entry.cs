@@ -85,8 +85,6 @@ public abstract class Entry {
         this.type = type;
         this.deleted_entry_state = deleted_entry_state;
 
-        this.switched_deletion_mode = false;
-
     }
 
     public void _undoFinish() {
@@ -98,31 +96,37 @@ public abstract class Entry {
     }
 
     public void _undoDelete() {
-
-        if (this.is_deleted)
-            this.switched_deletion_mode = true;
-
         this.deleted_entry_state = null;
     }
 
     public void _doDelete(DeletedEntryStatus status) {
-
-        if (this.is_deleted == false)
-            this.switched_deletion_mode = true;
-
-        this.deleted_entry_state = new DeletedEntryState(DateOnly.FromDateTime(DateTime.Today),this.status,status);
+        var last_status = this.deleted_entry_state == null ? this.status : this.deleted_entry_state.last_status;
+        this.deleted_entry_state = new DeletedEntryState(DateOnly.FromDateTime(DateTime.Today),last_status,status);
     }
 
     public void recoverEntry() {
 
-        this.status = this.deleted_entry_state!.last_status;
-        
-        if (this.status == EntryStatus.Done)
-            this._doFinish();
-        else
-            this._undoFinish();
+        if (this.deleted_entry_state != null) {
 
-        this.deleted_entry_state = null;
+            this.status = this.deleted_entry_state.last_status;
+            
+            if (this.status == EntryStatus.Done)
+                this._doFinish();
+            else
+                this._undoFinish();
+
+            this.deleted_entry_state = null;
+
+        }
+
+    }
+
+    public void undraftEntry() {
+
+        if (this.type == EntryType.Transaction)
+            setStatusDone();
+        else
+            setStatusOnGoing();
 
     }
 

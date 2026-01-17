@@ -35,8 +35,11 @@ namespace DAO {
 
                     e.isVisible,
                     e.type,
+
                     e.moneyAmount,
                     e.moneyAmountSpent,
+                    COALESCE(em.totalMoney, 0) AS moneyAmountSpentMovements,
+
                     e.date,
                     e.lastChangeDate,
                     e.creationDate,
@@ -47,6 +50,47 @@ namespace DAO {
                     de.deletionDate,
                     de.deletedStatus,
                     de.lastStatus
+
+                  FROM Entries AS e
+
+                  LEFT JOIN Categories AS c
+                    ON e.categoryId = c.id
+
+                  LEFT JOIN MonthlyServices AS ms
+                    ON e.monthlyServiceId = ms.id
+
+                  LEFT JOIN DeletedEntries AS de
+                    ON e.id = de.id
+                    
+                  LEFT JOIN (
+                      SELECT
+                          entryId,
+                          SUM(money) AS totalMoney
+                      FROM EntryMovements
+                      GROUP BY entryId
+                  ) AS em
+                      ON e.id = em.entryId;");
+
+        public static async Task EntryListing() =>
+            await DAOUtils.CreateTableOrIndex(@$"
+                CREATE OR REPLACE VIEW VEntryList AS
+                  SELECT
+                    e.id,
+
+                    e.categoryId          AS categoryId,
+                    c.name                AS categoryName,
+
+                    e.monthlyServiceId      AS monthlyServiceId,
+                    ms.name                 AS monthlyServiceName,
+
+                    e.isVisible,
+                    e.type,
+                    e.moneyAmount,
+                    e.moneyAmountSpent,
+                    e.date,
+                    e.dueDate,
+                    e.status,
+                    de.deletedStatus
 
                   FROM Entries AS e
 

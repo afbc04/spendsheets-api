@@ -12,19 +12,23 @@ namespace Controller {
         private EntryDAO dao;
 
         private EntryTransactionController transactions_controller;
+        private EntryCommitmentController commitments_controller;
+        private EntrySavingsController savings_controller;
 
         public EntryController() {
             this.Lock = new();
             this.dao = new EntryDAO();
             this.transactions_controller = new EntryTransactionController(this.dao);
+            this.commitments_controller = new EntryCommitmentController(this.dao);
+            this.savings_controller = new EntrySavingsController(this.dao);
         }
 
         // FIXME: add other types
         public async Task<Entry?> _Get(long ID,EntryType type) {
             return type switch {
                 EntryType.Transaction => await this.transactions_controller._Get(ID),
-                EntryType.Commitment => await this.transactions_controller._Get(ID),
-                EntryType.Saving => await this.transactions_controller._Get(ID),
+                EntryType.Commitment => await this.commitments_controller._Get(ID),
+                EntryType.Saving => await this.savings_controller._Get(ID),
                 _ => null
             };
         }
@@ -46,21 +50,21 @@ namespace Controller {
             });
         }
 
-        /*
         public async Task<SendingPacket> List(QueriesRequest? query_request) {
 
-            var query = QTO.Entry(query_request);
+            var query = QTO.EntryList(query_request);
             var values = await this.dao.Values(query);
 
             return new PacketSuccess(200,new Pageable(
                 query.limit,
                 query.page,
                 values.count,
-                values.list.Select(i => i.to_json()).ToList()!)
+                values.list.Select(i => i.ToJson()).ToList()!)
                 .to_json());
 
         }
 
+        /*
         public async Task<SendingPacket> Clear(QueriesRequest? query_request) {
 
             bool clear_specific = query_request != null && query_request.queries.ContainsKey("ids");
@@ -112,7 +116,9 @@ namespace Controller {
 
                 return entry_extraction.getType() switch {
                     EntryType.Transaction => await this.transactions_controller.Create(entry_data,category,monthly_service),
-                    _ => new PacketFail(501)
+                    EntryType.Commitment => await this.commitments_controller.Create(entry_data,category,monthly_service),
+                    EntryType.Saving => await this.savings_controller.Create(entry_data,category),
+                    _ => new PacketFail(417,"Invalid type of entry")
                 };
 
 
@@ -159,7 +165,9 @@ namespace Controller {
 
                         return entry_extraction.getType() switch {
                             EntryType.Transaction => await this.transactions_controller.Update(entry_data,id,category,monthly_service),
-                            _ => new PacketFail(501)
+                            EntryType.Commitment => await this.commitments_controller.Update(entry_data,id,category,monthly_service),
+                            EntryType.Saving => await this.savings_controller.Update(entry_data,id,category),
+                            _ => new PacketFail(417,"Invalid type of entry")
                         };
 
 
@@ -189,7 +197,9 @@ namespace Controller {
 
                         return entry_extraction.getType() switch {
                             EntryType.Transaction => await this.transactions_controller.Patch(entry_data,id,category,monthly_service),
-                            _ => new PacketFail(501)
+                            EntryType.Commitment => await this.commitments_controller.Patch(entry_data,id,category,monthly_service),
+                            EntryType.Saving => await this.savings_controller.Patch(entry_data,id,category),
+                            _ => new PacketFail(417,"Invalid type of entry")
                         };
 
 

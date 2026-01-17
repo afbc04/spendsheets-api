@@ -17,6 +17,7 @@ namespace DAO {
         type,
         money_amount,
         money_amount_spent,
+        money_amount_spent_movements,
         date,
         last_change_date,
         creation_date,
@@ -29,6 +30,21 @@ namespace DAO {
         last_status
     };
 
+    enum EntryListFields {
+        id,
+        category_id,
+        category_name,
+        monthly_service_id,
+        monthly_service_name,
+        type,
+        money_amount,
+        money_amount_spent,
+        date,
+        due_date,
+        status,
+        deleted_status
+    };
+
     public class EntryDAO {
 
         public async Task<EntryDetails?> GetDetailed(long ID) {
@@ -39,12 +55,20 @@ namespace DAO {
             return await _Get(ID,EntryGetDAO.serialize_transaction);
         }
 
+        public async Task<EntrySavings?> GetSavings(long ID) {
+            return await _Get(ID,EntryGetDAO.serialize_savings);
+        }
+
+        public async Task<EntryCommitment?> GetCommitment(long ID) {
+            return await _Get(ID,EntryGetDAO.serialize_commitment);
+        }
+
         private async Task<T?> _Get<T>(long ID, Func<NpgsqlDataReader,T> serializer) where T : class {
 
             const string sql = @"SELECT 
                     id, categoryId, categoryName, categoryDescription, 
                     monthlyServiceId, monthlyServiceName, monthlyServiceDescription, monthlyServiceActive,
-                    isVisible, type, moneyAmount, moneyAmountSpent, date, lastChangeDate, creationDate,
+                    isVisible, type, moneyAmount, moneyAmountSpent, moneyAmountSpentMovements, date, lastChangeDate, creationDate,
                     finishDate, dueDate, description, status, deletionDate, deletedStatus, lastStatus
                 FROM VEntries WHERE id = @id;";
             return await DAOUtils.Query(sql, async cmd => {
@@ -380,10 +404,13 @@ namespace DAO {
             }
         }
 
-        /*
-        public async Task<DAOListing<Category>> Values(Query query) {
-            return await DAOUtils.List("Categories","id, name, description",query, r => _serialize(r));
-        }*/
+        public async Task<DAOListing<EntryList>> Values(Query query) {
+            return await DAOUtils.List(
+                "VEntryList",
+                "id, categoryId, categoryName, monthlyServiceId, monthlyServiceName, type, moneyAmount, moneyAmountSpent, date, dueDate, status, deletedStatus",
+                query, 
+                r => EntryGetListDAO.serialize_list(r));
+        }
 
         public async Task<IList<long>> Keys() {
 

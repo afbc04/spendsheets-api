@@ -18,18 +18,17 @@ public class EntryManager {
         this.config = config;
     }
 
-    /*
     public async Task<SendingPacket> List(string? extracted_token, QueriesRequest? query) {
         
         using (await config.Lock.ReaderLockAsync())
         using (await token.Lock.ReaderLockAsync())
             return await ManagerHelper.WithTokenReaderPublic(config,token,extracted_token,async (access_token) => {
-                using (await monthly_service.Lock.ReaderLockAsync())
-                    return await monthly_service.List(query);
+                using (await entry.Lock.ReaderLockAsync())
+                    return await entry.List(query);
             });
         
     }
-
+    /*
     public async Task<SendingPacket> Clear(string? extracted_token, QueriesRequest? query) {
         
         using (await config.Lock.ReaderLockAsync())
@@ -63,11 +62,11 @@ public class EntryManager {
                 using (await entry.Lock.WriterLockAsync()) {
 
                     Category? category = null;
-                    if (request_data.ContainsKey("categoryId"))
+                    if (request_data.ContainsKey("categoryId") && request_data["categoryId"] != null)
                         category = await this.category._Get((long) request_data["categoryId"]);
 
                     MonthlyServiceSimple? monthly_service = null;
-                    if (request_data.ContainsKey("monthlyServiceId"))
+                    if (request_data.ContainsKey("monthlyServiceId") && request_data["monthlyServiceId"] != null)
                         monthly_service = await this.monthly_service._Get((long) request_data["monthlyServiceId"]);
 
                     return await entry.Create(request_data,category,monthly_service);
@@ -110,11 +109,11 @@ public class EntryManager {
                 using (await entry.Lock.WriterLockAsync()) {
 
                     Category? category = null;
-                    if (request_data.ContainsKey("categoryId"))
+                    if (request_data.ContainsKey("categoryId") && request_data["categoryId"] != null)
                         category = await this.category._Get((long) request_data["categoryId"]);
 
                     MonthlyServiceSimple? monthly_service = null;
-                    if (request_data.ContainsKey("monthlyServiceId"))
+                    if (request_data.ContainsKey("monthlyServiceId") && request_data["monthlyServiceId"] != null)
                         monthly_service = await this.monthly_service._Get((long) request_data["monthlyServiceId"]);
 
                     return await entry.Patch(request_data,id,category,monthly_service);
@@ -135,11 +134,11 @@ public class EntryManager {
                 using (await entry.Lock.WriterLockAsync()) {
 
                     Category? category = null;
-                    if (request_data.ContainsKey("categoryId"))
+                    if (request_data.ContainsKey("categoryId") && request_data["categoryId"] != null)
                         category = await this.category._Get((long) request_data["categoryId"]);
 
                     MonthlyServiceSimple? monthly_service = null;
-                    if (request_data.ContainsKey("monthlyServiceId"))
+                    if (request_data.ContainsKey("monthlyServiceId") && request_data["monthlyServiceId"] != null)
                         monthly_service = await this.monthly_service._Get((long) request_data["monthlyServiceId"]);
 
                     return await entry.Update(request_data,id,category,monthly_service);

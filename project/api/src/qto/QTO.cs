@@ -47,7 +47,42 @@ public class QTO {
         });
     }
 
+    public static Query EntryList(QueriesRequest? request) {
+        return QTOHelper.getQuery(request, r => {
+
+            var query = new Query(r.limit, r.page);
+            query.setSortList(r.sort);
+
+            return query;
+
+        });
+    }
+
     public static Query EntryTags(QueriesRequest? request, long entryID) {
+        return QTOHelper.getQuery(request, r => {
+
+            var query = new Query(r.limit, r.page);
+            query.setSortList(r.sort);
+            query.setFilter("entryId","=",entryID);
+
+            return query;
+
+        });
+    }
+
+    public static Query EntryNotes(QueriesRequest? request, long entryID) {
+        return QTOHelper.getQuery(request, r => {
+
+            var query = new Query(r.limit, r.page);
+            query.setSortList(r.sort);
+            query.setFilter("entryId","=",entryID);
+
+            return query;
+
+        });
+    }
+
+    public static Query EntryMovements(QueriesRequest? request, long entryID) {
         return QTOHelper.getQuery(request, r => {
 
             var query = new Query(r.limit, r.page);
