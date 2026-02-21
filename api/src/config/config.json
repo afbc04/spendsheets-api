@@ -1,0 +1,9 @@
+{
+  "database": 1,
+  "lastOnlineDate": "2026-02-02T14:52:55",
+  "name": "Ola mundo",
+  "public": true,
+  "initialMoney": 100,
+  "lostMoney": 200,
+  "savedMoney": 300
+}

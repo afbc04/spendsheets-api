@@ -1,10 +1,10 @@
 services:
 
   api:
-    build: ./project/api/.
+    build: ./api/.
     container_name: ss-api
     volumes:
-      - ./project/api/src:/api/src
+      - ./api/src:/api/src
     ports:
       - "${API_PORT}:8080"
     env_file:
@@ -21,7 +21,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./project/database/data:/var/lib/postgresql/data
+      - ./database/data:/var/lib/postgresql/data
     networks:
       - api-to-database
 

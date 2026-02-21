@@ -1,0 +1,30 @@
+name,description
+Income,Issued invoices or received payments
+Expense,Received invoices or bills
+Goods,Purchase or sale of physical items
+Services,Purchase or sale of services
+Housing,Property or space-related costs
+Utilities,Essential recurring services
+Food,Food and beverage related invoices
+Transportation,Travel and mobility expenses
+Fuel,Vehicle energy expenses
+Maintenance,Repairs and upkeep costs
+Healthcare,Medical or health-related invoices
+Insurance,Insurance-related invoices
+Education,Training or educational services
+Professional Services,"Legal, accounting, consulting"
+Technology,"Software, hardware, IT services"
+Telecommunications,Phone and internet services
+Subscriptions,Recurring billed services
+Marketing,Advertising and promotion expenses
+Office Supplies,Day-to-day office materials
+Equipment,Durable assets or tools
+Logistics,Shipping and delivery costs
+Travel,Accommodation and travel services
+Taxes,Government-issued invoices or fees
+Fees,Bank or administrative charges
+Payroll,Salary or compensation-related invoices
+Financial Services,Banking or financial operations
+Personal,Non-business personal expenses
+Donations,Charitable or non-commercial invoices
+Miscellaneous,Invoices that do not fit other classifiers

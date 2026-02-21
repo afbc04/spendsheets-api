@@ -1,0 +1,78 @@
+using ConfigHandler;
+
+namespace DTO {
+
+    // Exception when some proprieties break rules
+    public class ConfigDTOException : Exception {
+
+        public string message {private set; get;}
+
+        public ConfigDTOException(string message) {
+            this.message = message;
+        }
+
+    }
+
+    public class ConfigDTO {
+
+        private ConfigUpdating _config;
+
+        public ConfigDTO() {
+            this._config = new ConfigUpdating();
+        }
+
+        public ConfigDTO(Config config) {
+            this._config = new ConfigUpdating(config);
+        }
+
+        // Final method
+        public ConfigUpdating extract() {
+            return this._config;
+        }
+
+        // @@@@@@@@@@@@@@@@
+        //    SETTERS
+        // @@@@@@@@@@@@@@@@
+        public void set_name(string? name) {
+
+            if (name != null && name.Length >= ConfigRules.name_length_max)
+                throw new ConfigDTOException($"Name is too long (more than {ConfigRules.name_length_max} characters)");
+
+            this._config.name = name;
+
+        }
+
+        public void set_public(bool is_public) {
+            this._config.is_public = is_public;
+        }
+
+        public void set_initial_money(double initial_money) {
+
+            if (initial_money < 0)
+                throw new ConfigDTOException("Initial money can not be negative");
+
+            this._config.money_initial = Money.Convert64(initial_money);
+
+        }
+
+        public void set_lost_money(double lost_money) {
+
+            if (lost_money < 0)
+                throw new ConfigDTOException("Lost money can not be negative");
+
+            this._config.money_lost = Money.Convert64(lost_money);
+
+        }
+
+        public void set_saved_money(double saved_money) {
+
+            if (saved_money < 0)
+                throw new ConfigDTOException("Saved money can not be negative");
+
+            this._config.money_saved = Money.Convert64(saved_money);
+
+        }
+
+    }
+
+}
