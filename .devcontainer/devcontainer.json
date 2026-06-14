@@ -1,0 +1,20 @@
+{
+  "name": "Spendsheets API",
+  "image": "mcr.microsoft.com/dotnet/sdk:8.0",
+  "workspaceFolder": "/workspace",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.csdevkit"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+
+  "postCreateCommand": "dotnet tool restore && dotnet restore src/TodoApi/TodoApi.csproj",
+  "remoteUser": "root"
+}

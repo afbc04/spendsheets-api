@@ -1,0 +1,5 @@
+database/
+database/data
+bin/
+obj/
+.git/

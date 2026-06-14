@@ -1,0 +1,39 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET Core Attach",
+      "type": "coreclr",
+      "request": "attach"
+    },
+    {
+      "name": ".NET Core Launch (TodoApi)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/src/bin/Debug/net8.0/Program.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src",
+      "stopAtEntry": false,
+      "console": "internalConsole",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://0.0.0.0:5000"
+      },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      }
+    },
+    {
+      "name": "Docker Compose Dev",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "docker-compose-dev",
+      "program": "${workspaceFolder}/src/bin/Debug/net8.0/Program.dll",
+      "cwd": "${workspaceFolder}/src",
+      "stopAtEntry": false,
+      "console": "internalConsole"
+    }
+  ]
+}

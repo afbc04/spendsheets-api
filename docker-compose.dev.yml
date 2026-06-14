@@ -1,0 +1,35 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: spendsheets-api-dev
+    ports:
+      - "${API_PORT}:8080"
+    env_file:
+      - .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=Data/app.db
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+    volumes:
+      - ./src:/app
+      - nuget_cache:/root/.nuget/packages
+
+  database:
+    image: postgres:16-alpine
+    container_name: spendsheets-database
+    environment:
+      POSTGRES_DB: ssdb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  data:
+  nuget_cache:

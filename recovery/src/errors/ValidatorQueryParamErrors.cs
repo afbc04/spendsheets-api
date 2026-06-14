@@ -1,0 +1,1 @@
+public class ValidatorQueryParamMiddlewareException(string message) : Exception(message);

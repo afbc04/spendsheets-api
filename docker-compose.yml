@@ -1,0 +1,32 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: spendsheets-api
+    ports:
+      - "${API_PORT}:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      # O ficheiro .db fica fora do container, persistido na pasta ./data do host
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/app.db
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+  database:
+    image: postgres:16-alpine
+    container_name: spendsheets-database
+    environment:
+      POSTGRES_DB: ssdb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  data:

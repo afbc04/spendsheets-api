@@ -1,0 +1,32 @@
+{
+    "id" : 1,
+    "note" : "what about this?",
+    "date" : "01-03-2026",
+    "money" : 17.90,
+    "invisible" : false,
+    "public" : true,
+    "createdAt" : "01-03-2026",
+    "updatedAt" : "01-03-2026",
+    "deletedAt" : "01-03-2026",
+    "status": "posted",
+    "draft" : false,
+    "deleted" : false,
+    "singleProduct" : true,
+    "products": [
+        {
+            "money": 17.90,
+            "description": "Fuel",
+            "category": {
+                "id": 1,
+                "name": "Fuel"
+            },
+            "tags": [
+                {
+                    "id": 1,
+                    "name": "event"
+                }
+            ],
+            "goals": []
+        }
+    ]
+}

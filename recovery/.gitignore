@@ -1,0 +1,6 @@
+obj/
+bin/
+database/*
+logs/*
+.venv
+.vscode

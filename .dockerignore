@@ -1,0 +1,9 @@
+**/bin/
+**/obj/
+.vscode/
+.devcontainer/
+.git/
+.gitignore
+data/
+*.db
+README.md
