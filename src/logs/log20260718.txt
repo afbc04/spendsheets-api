@@ -1,0 +1,108 @@
+2026-07-18 20:43:55.432 +00:00 [ERR] Resource temporarily unavailable
+2026-07-18 20:44:07.670 +00:00 [ERR]    at System.Net.Dns.GetHostEntryOrAddressesCore(String hostName, Boolean justAddresses, AddressFamily addressFamily, Nullable`1 startingTimestamp)
+   at System.Net.Dns.<>c.<GetHostEntryOrAddressesCoreAsync>b__33_0(Object s, Int64 startingTimestamp)
+   at System.Net.Dns.<>c__DisplayClass39_0`1.<RunAsync>b__0(Task <p0>, Object <p1>)
+   at System.Threading.Tasks.ContinuationResultTaskFromTask`1.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at Npgsql.TaskTimeoutAndCancellation.ExecuteAsync(Func`2 getTaskFunc, NpgsqlTimeout timeout, CancellationToken cancellationToken)
+   at Npgsql.TaskTimeoutAndCancellation.ExecuteAsync[TResult](Func`2 getTaskFunc, NpgsqlTimeout timeout, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.ConnectAsync(NpgsqlTimeout timeout, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.RawOpen(SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken, Boolean isFirstAttempt)
+   at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|213_1(NpgsqlConnector conn, SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken, Boolean isFirstAttempt)
+   at Npgsql.Internal.NpgsqlConnector.Open(NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.OpenNewConnector(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.<Get>g__RentAsync|33_0(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlConnection.<Open>g__OpenAsync|42_0(Boolean async, CancellationToken cancellationToken)
+   at RepositoryHandler.OpenConnection() in /app/repositories/handlers/RepositoryHandler.cs:line 8
+   at ProfileRepository.List() in /app/repositories/dao/profiles/ProfileRepository.cs:line 20
+   at SessionManager.InitSessionManager() in /app/auth/SessionManager.cs:line 18
+   at Program.StartApi() in /app/Program.cs:line 43
+2026-07-18 20:46:00.867 +00:00 [ERR] Resource temporarily unavailable
+2026-07-18 20:46:10.922 +00:00 [ERR]    at System.Net.Dns.GetHostEntryOrAddressesCore(String hostName, Boolean justAddresses, AddressFamily addressFamily, Nullable`1 startingTimestamp)
+   at System.Net.Dns.<>c.<GetHostEntryOrAddressesCoreAsync>b__33_0(Object s, Int64 startingTimestamp)
+   at System.Net.Dns.<>c__DisplayClass39_0`1.<RunAsync>b__0(Task <p0>, Object <p1>)
+   at System.Threading.Tasks.ContinuationResultTaskFromTask`1.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at Npgsql.TaskTimeoutAndCancellation.ExecuteAsync(Func`2 getTaskFunc, NpgsqlTimeout timeout, CancellationToken cancellationToken)
+   at Npgsql.TaskTimeoutAndCancellation.ExecuteAsync[TResult](Func`2 getTaskFunc, NpgsqlTimeout timeout, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.ConnectAsync(NpgsqlTimeout timeout, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.RawOpen(SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken, Boolean isFirstAttempt)
+   at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|213_1(NpgsqlConnector conn, SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken, Boolean isFirstAttempt)
+   at Npgsql.Internal.NpgsqlConnector.Open(NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.OpenNewConnector(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.<Get>g__RentAsync|33_0(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlConnection.<Open>g__OpenAsync|42_0(Boolean async, CancellationToken cancellationToken)
+   at RepositoryHandler.OpenConnection() in /app/repositories/handlers/RepositoryHandler.cs:line 8
+   at ProfileRepository.List() in /app/repositories/dao/profiles/ProfileRepository.cs:line 20
+   at SessionManager.InitSessionManager() in /app/auth/SessionManager.cs:line 18
+   at Program.StartApi() in /app/Program.cs:line 43
+2026-07-18 20:46:39.549 +00:00 [ERR] Resource temporarily unavailable
+2026-07-18 20:46:49.606 +00:00 [ERR]    at System.Net.Dns.GetHostEntryOrAddressesCore(String hostName, Boolean justAddresses, AddressFamily addressFamily, Nullable`1 startingTimestamp)
+   at System.Net.Dns.<>c.<GetHostEntryOrAddressesCoreAsync>b__33_0(Object s, Int64 startingTimestamp)
+   at System.Net.Dns.<>c__DisplayClass39_0`1.<RunAsync>b__0(Task <p0>, Object <p1>)
+   at System.Threading.Tasks.ContinuationResultTaskFromTask`1.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at Npgsql.TaskTimeoutAndCancellation.ExecuteAsync(Func`2 getTaskFunc, NpgsqlTimeout timeout, CancellationToken cancellationToken)
+   at Npgsql.TaskTimeoutAndCancellation.ExecuteAsync[TResult](Func`2 getTaskFunc, NpgsqlTimeout timeout, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.ConnectAsync(NpgsqlTimeout timeout, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.RawOpen(SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken, Boolean isFirstAttempt)
+   at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|213_1(NpgsqlConnector conn, SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken, Boolean isFirstAttempt)
+   at Npgsql.Internal.NpgsqlConnector.Open(NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.OpenNewConnector(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.<Get>g__RentAsync|33_0(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlConnection.<Open>g__OpenAsync|42_0(Boolean async, CancellationToken cancellationToken)
+   at RepositoryHandler.OpenConnection() in /app/repositories/handlers/RepositoryHandler.cs:line 8
+   at ProfileRepository.List() in /app/repositories/dao/profiles/ProfileRepository.cs:line 20
+   at SessionManager.InitSessionManager() in /app/auth/SessionManager.cs:line 18
+   at Program.StartApi() in /app/Program.cs:line 43
+2026-07-18 20:47:21.159 +00:00 [ERR] Resource temporarily unavailable
+2026-07-18 20:47:33.473 +00:00 [ERR]    at System.Net.Dns.GetHostEntryOrAddressesCore(String hostName, Boolean justAddresses, AddressFamily addressFamily, Nullable`1 startingTimestamp)
+   at System.Net.Dns.<>c.<GetHostEntryOrAddressesCoreAsync>b__33_0(Object s, Int64 startingTimestamp)
+   at System.Net.Dns.<>c__DisplayClass39_0`1.<RunAsync>b__0(Task <p0>, Object <p1>)
+   at System.Threading.Tasks.ContinuationResultTaskFromTask`1.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at Npgsql.TaskTimeoutAndCancellation.ExecuteAsync(Func`2 getTaskFunc, NpgsqlTimeout timeout, CancellationToken cancellationToken)
+   at Npgsql.TaskTimeoutAndCancellation.ExecuteAsync[TResult](Func`2 getTaskFunc, NpgsqlTimeout timeout, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.ConnectAsync(NpgsqlTimeout timeout, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.RawOpen(SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken, Boolean isFirstAttempt)
+   at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|213_1(NpgsqlConnector conn, SslMode sslMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken, Boolean isFirstAttempt)
+   at Npgsql.Internal.NpgsqlConnector.Open(NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.OpenNewConnector(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.<Get>g__RentAsync|33_0(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlConnection.<Open>g__OpenAsync|42_0(Boolean async, CancellationToken cancellationToken)
+   at RepositoryHandler.OpenConnection() in /app/repositories/handlers/RepositoryHandler.cs:line 8
+   at ProfileRepository.List() in /app/repositories/dao/profiles/ProfileRepository.cs:line 20
+   at SessionManager.InitSessionManager() in /app/auth/SessionManager.cs:line 18
+   at Program.StartApi() in /app/Program.cs:line 43
+2026-07-18 22:22:40.790 +00:00 [INF] API is listenning at port 16000
+2026-07-18 22:36:03.803 +00:00 [INF] API is listenning at port 16000
+2026-07-18 22:37:00.242 +00:00 [INF] API is listenning at port 16000
+2026-07-18 22:58:55.056 +00:00 [INF] API is listenning at port 16000
+2026-07-18 23:08:51.914 +00:00 [INF] API is listenning at port 16000
+2026-07-18 23:09:46.408 +00:00 [INF] API is listenning at port 16000
+2026-07-18 23:13:35.016 +00:00 [INF] API is listenning at port 16000
+2026-07-18 23:16:00.603 +00:00 [INF] API is listenning at port 16000
+2026-07-18 23:16:09.557 +00:00 [INF] API is listenning at port 16000
+2026-07-18 23:16:14.869 +00:00 [INF] API is listenning at port 16000
+2026-07-18 23:40:30.621 +00:00 [INF] API is listenning at port 16000
+2026-07-18 23:41:57.666 +00:00 [INF] API is listenning at port 16000
+2026-07-18 23:49:00.357 +00:00 [INF] API is listenning at port 16000
+2026-07-18 23:54:07.586 +00:00 [INF] API is listenning at port 16000
+2026-07-18 23:55:11.061 +00:00 [INF] API is listenning at port 16000
+2026-07-18 23:56:25.581 +00:00 [INF] API is listenning at port 16000
