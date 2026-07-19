@@ -23,6 +23,17 @@ public class DatabaseTableCreator
         password_salt BYTEA NOT NULL
       );");
 
+  public static async Task<int> Workspaces() =>
+    await DatabaseUtils.ExecuteQuery(@$"
+      CREATE TABLE IF NOT EXISTS workspaces (
+        id SERIAL PRIMARY KEY,
+
+        name VARCHAR({WorkspaceRules.NameLengthMax}) NOT NULL,
+        description VARCHAR({WorkspaceRules.DescriptionLengthMax}),
+
+        initial_money BIGINT NOT NULL
+      );");
+
 /*
   public static async Task<int> Categories() => await DatabaseUtils.ExecuteQuery(@$"
     CREATE TABLE IF NOT EXISTS categories (

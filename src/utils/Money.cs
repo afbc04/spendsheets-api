@@ -28,5 +28,4 @@ public class Money {
         return (int) Math.Round(value * 100m, MidpointRounding.AwayFromZero);
 
     }
-
 }

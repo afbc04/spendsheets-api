@@ -10,6 +10,7 @@ public static class Routers {
         api.UserRoutersMapping();
         api.ProfileRoutersMapping();
         api.SessionRoutersMapping();
+        api.WorkspacesRoutersMapping();
         api.TokenRoutersMapping();
 
     }

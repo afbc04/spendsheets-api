@@ -8,7 +8,7 @@ public class DatabaseManager
     public static readonly int DatabaseVersionLastCompatible = 1; //Older compatible database version this API can serve
 
     public static readonly string ConnectionString = $@"
-            Host=localhost;
+            Host=spendsheets-database;
             Database={Environment.GetEnvironmentVariable("POSTGRES_DB")};
             Username={Environment.GetEnvironmentVariable("POSTGRES_USER")};
             Password={Environment.GetEnvironmentVariable("POSTGRES_PASSWORD")}";
@@ -90,6 +90,7 @@ public class DatabaseManager
             ");*/
 
         res *= await DatabaseTableCreator.Profiles();
+        res *= await DatabaseTableCreator.Workspaces();
 /*
         res *= await DatabaseTableCreator.Users();
         res *= await DatabaseTableCreator.Categories();
