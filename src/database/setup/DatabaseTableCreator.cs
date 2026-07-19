@@ -34,6 +34,32 @@ public class DatabaseTableCreator
         initial_money BIGINT NOT NULL
       );");
 
+  public static async Task<int> Records() => 
+    await DatabaseUtils.ExecuteQuery(@$"
+      CREATE TABLE IF NOT EXISTS records (
+          id SERIAL PRIMARY KEY,
+
+          note VARCHAR({RecordRules.NoteLengthMax}),
+          value BIGINT NOT NULL,
+          date DATE NOT NULL,
+
+          workspace BIGINT NOT NULL,
+
+          invisible BOOLEAN NOT NULL,
+          public BOOLEAN NOT NULL,
+
+          creation_date DATE NOT NULL,
+          updated_date DATE NOT NULL,
+          deletion_date DATE,
+
+          status SMALLINT NOT NULL,
+
+          CONSTRAINT fk_records_workspace
+              FOREIGN KEY (workspace)
+              REFERENCES workspaces(id)
+              ON DELETE CASCADE
+      );");
+
 /*
   public static async Task<int> Categories() => await DatabaseUtils.ExecuteQuery(@$"
     CREATE TABLE IF NOT EXISTS categories (

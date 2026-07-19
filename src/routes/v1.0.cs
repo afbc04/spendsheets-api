@@ -4,14 +4,10 @@ public static class Routers {
         
         var api = app.MapGroup("");
 
-        api.RecordRoutersMapping();
-        api.TagRoutersMapping();
-        api.CategoryRoutersMapping();
-        api.UserRoutersMapping();
         api.ProfileRoutersMapping();
         api.SessionRoutersMapping();
         api.WorkspacesRoutersMapping();
-        api.TokenRoutersMapping();
+        api.RecordRoutersMapping();
 
     }
 

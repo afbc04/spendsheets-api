@@ -80,27 +80,9 @@ public class DatabaseManager
     {
         int res = 1;
 
-/*
-        res *= await DatabaseTableCreator.DatabaseConfigurations();
-
-        if (shouldCreateDatabase)
-            res *= await DatabaseUtils.ExecuteQuery($@"
-                INSERT INTO database_config (id, database_version)
-                    VALUES (0, {DatabaseVersion});
-            ");*/
-
         res *= await DatabaseTableCreator.Profiles();
         res *= await DatabaseTableCreator.Workspaces();
-/*
-        res *= await DatabaseTableCreator.Users();
-        res *= await DatabaseTableCreator.Categories();
-        res *= await DatabaseTableCreator.Tags();
-
         res *= await DatabaseTableCreator.Records();
-        res *= await DatabaseTableCreator.RecordItems();
-        res *= await DatabaseTableCreator.RecordItemsTags();
-
-        */
 
         return res == 0
             ? DatabaseStatus.SetupFail

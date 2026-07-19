@@ -7,8 +7,8 @@ public static class WorkspacesRouters {
         // GET /workspaces
         app.MapGet("", async (HttpRequest request) => {
 
-            await ValidatorSessionMiddleware.TryValidateSession(request);
-            var resultPacket = await WorkspaceController.ListWorkspace(false);
+            var session = await ValidatorSessionMiddleware.TryValidateSession(request);
+            var resultPacket = await WorkspaceController.ListWorkspace(session is null);
             return resultPacket.Send();
 
         });
@@ -26,9 +26,9 @@ public static class WorkspacesRouters {
         // GET /workspaces/:id
         app.MapGet("{queryParamId}", async (HttpRequest request, string queryParamId) => {
 
-            await ValidatorSessionMiddleware.TryValidateSession(request);
+            var session = await ValidatorSessionMiddleware.TryValidateSession(request);
             long id = await ValidatorQueryParamMiddleware.ValidateNumericalID(queryParamId);
-            var resultPacket = await WorkspaceController.GetWorkspace(id, false);
+            var resultPacket = await WorkspaceController.GetWorkspace(id, session is null);
             return resultPacket.Send();
 
         });

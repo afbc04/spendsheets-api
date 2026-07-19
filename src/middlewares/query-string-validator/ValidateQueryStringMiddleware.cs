@@ -34,15 +34,30 @@ public static class ValidatorQueryStringMiddleware
                     ? value.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                     : [value.ToString()];
 
-                int ListLength = ValuesToAnalyse.Length;
-                for (int i = 0; i < ListLength; i++)
+                if (de.Value.IsList)
                 {
-                    var item = ValuesToAnalyse[i];
+                    var list = new List<object?>();
 
-                    if (de.Value.IsList)
-                        path += $"[{i}]";
+                    for (int i = 0; i < ValuesToAnalyse.Length; i++)
+                    {
+                        list.Add(_ObtainItemValue(
+                            ValuesToAnalyse[i],
+                            ((ValidatorQueryStringItemMiddleware)de.Value).DateType,
+                            ref wrongDatatypes,
+                            de.Value.AllowNull,
+                            $"{NewPath}[{i}]"));
+                    }
 
-                    Data[de.Key] = _ObtainItemValue(item, ((ValidatorQueryStringItemMiddleware)de.Value).DateType, ref wrongDatatypes, de.Value.AllowNull, NewPath);
+                    Data[de.Key] = list;
+                }
+                else
+                {
+                    Data[de.Key] = _ObtainItemValue(
+                        ValuesToAnalyse[0],
+                        ((ValidatorQueryStringItemMiddleware)de.Value).DateType,
+                        ref wrongDatatypes,
+                        de.Value.AllowNull,
+                        NewPath);
                 }
             }
         }

@@ -1,29 +1,73 @@
+using System.Text;
 using Npgsql;
 
-public static class RecordsRepository
+public static class RecordRepository
 {
-    /*
-    public static async Task<DAOList<CategoryModelList>> List(QueryPage page, Dictionary<string,object?> filters)
+    public static async Task<DAOList<Record>> List(QueryPage page, Dictionary<string,object?> filters)
     {
         List<string> whereParts = [];
         List<NpgsqlParameter?> parameters = [];
 
-        if (filters.TryGetValue("name", out var name))
+        if (filters.TryGetValue("status", out var status))
         {
-            whereParts.Add("c.name ILIKE @nameFilter");
-            parameters.Add(new NpgsqlParameter("nameFilter",$"{name}%"));
+            List<string> sb = [];
+            foreach(string s in (List<object>)status!)
+            {
+                var extractedStatus = RecordStatusFormatter.Parse(s);
+                if (extractedStatus is not null)
+                {
+                    sb.Add($"status = {RecordStatusFormatter.Import((RecordStatus)extractedStatus)}");
+                }
+            }
+
+            if (sb.Count > 0)
+            {
+                whereParts.Add(string.Join(" OR ", sb));
+                parameters.Add(null);
+            }
         }
 
-        if (filters.TryGetValue("parentId", out var parentId))
+        if (filters.TryGetValue("workspace", out var workspace))
         {
-            whereParts.Add("c.parent_id = @parentIdFilter");
-            parameters.Add(new NpgsqlParameter("parentIdFilter",parentId));
+            whereParts.Add("workspace = @workspace");
+            parameters.Add(new NpgsqlParameter("workspace",$"{workspace}"));
         }
 
-        if (filters.TryGetValue("subcategory", out var isSubcategory))
+        if (filters.TryGetValue("minDate", out var minDate))
         {
-            string subcategoryFilter = (bool)isSubcategory! ? "IS NOT NULL" : "IS NULL";
-            whereParts.Add($"c.parent_id {subcategoryFilter}");
+            whereParts.Add("date >= @minDate");
+            parameters.Add(new NpgsqlParameter("minDate",(DateOnly)minDate!));
+        }
+
+        if (filters.TryGetValue("maxDate", out var maxDate))
+        {
+            whereParts.Add("date <= @maxDate");
+            parameters.Add(new NpgsqlParameter("maxDate",(DateOnly)maxDate!));
+        }
+
+        if (filters.TryGetValue("public", out var isPublic))
+        {
+            string isPublicFilter = (bool)isPublic! ? "TRUE" : "FALSE";
+            whereParts.Add($"public = {isPublicFilter}");
+            parameters.Add(null);
+        }
+
+        if (filters.TryGetValue("invisible", out var invisible))
+        {
+            string invisibleFilter = (bool)invisible! ? "TRUE" : "FALSE";
+            whereParts.Add($"invisible = {invisibleFilter}");
+            parameters.Add(null);
+        }
+
+        if (filters.TryGetValue("onlyRevenues", out var onlyRevenues) && (bool)onlyRevenues! == true)
+        {
+            whereParts.Add($"value > 0");
+            parameters.Add(null);
+        }
+
+        if (filters.TryGetValue("onlyExpenses", out var onlyExpenses) && (bool)onlyExpenses! == true)
+        {
+            whereParts.Add($"value < 0");
             parameters.Add(null);
         }
 
@@ -45,22 +89,28 @@ public static class RecordsRepository
 
         string sqlData = $@"
             SELECT 
-                c.id, 
-                c.name, 
-                c.description, 
-                c.parent_id,
-                cp.name,
-                c.created_at
-            FROM categories c
-            LEFT JOIN categories cp ON c.parent_id = cp.id
+                id, 
+                note,
+                value,
+                date,
+                workspace,
+                invisible,
+                public,
+                creation_date,
+                updated_date,
+                deletion_date,
+                status
+            FROM records
             {where}
             {order}
             LIMIT @limit OFFSET @offset";
 
         string sqlCount = $@"
             SELECT COUNT(*)
-            FROM categories c
+            FROM records
             {where}";
+
+        Console.WriteLine(sqlData);
 
         await using var conn = await RepositoryHandler.OpenConnection();
 
@@ -74,7 +124,7 @@ public static class RecordsRepository
             totalElements = Convert.ToInt64(await countCmd.ExecuteScalarAsync());
         }
 
-        var listElements = new List<CategoryModelList>();
+        var listElements = new List<Record>();
         await using (var dataCmd = new NpgsqlCommand(sqlData, conn))
         {
             foreach (var parameter in parameters)
@@ -87,25 +137,29 @@ public static class RecordsRepository
             await using var reader = await dataCmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
-                listElements.Add(CategoriesRepositoryReader.SerializeList(reader));
+                listElements.Add(RecordsRepositoryReader.Serialize(reader));
         }
 
-        return new DAOList<CategoryModelList>(totalElements, listElements);
+        return new DAOList<Record>(totalElements, listElements);
     }
 
-    public static async Task<CategoryModel?> Get(long id)
+    public static async Task<Record?> Get(long id)
     {
         const string sql = @"
             SELECT 
-                c.id, 
-                c.name,
-                c.description,
-                c.parent_id,
-                cp.name as parent_name,
-                c.created_at
-            FROM categories as c
-            LEFT JOIN categories cp ON c.parent_id = cp.id
-            WHERE c.id = @id";
+                id, 
+                note,
+                value,
+                date,
+                workspace,
+                invisible,
+                public,
+                creation_date,
+                updated_date,
+                deletion_date,
+                status
+            FROM records
+            WHERE id = @id";
 
         await using var conn = await RepositoryHandler.OpenConnection();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -115,14 +169,14 @@ public static class RecordsRepository
         if (!await reader.ReadAsync())
             return null;
 
-        var category = CategoriesRepositoryReader.Serialize(reader);
+        var record = RecordsRepositoryReader.Serialize(reader);
         await reader.CloseAsync();
-        return category;
+        return record;
     }
 
     public static async Task<bool> Delete(long id)
     {
-        const string sql = "DELETE FROM categories WHERE id = @id";
+        const string sql = "DELETE FROM records WHERE id = @id";
 
         await using var conn = await RepositoryHandler.OpenConnection();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -130,112 +184,67 @@ public static class RecordsRepository
 
         int affectedRows = await cmd.ExecuteNonQueryAsync();
         return affectedRows > 0;
-    }
-
-    public static async Task<CategoryModelWithSubcategoryCount?> GetWithSubcategoryCountLockWriter(long id, NpgsqlTransaction tx)
-    {
-        const string sql = @"
-            SELECT 
-                c.id, 
-                c.name, 
-                c.description, 
-                c.parent_id,
-                cp.name,
-                c.created_at,
-                (
-                    SELECT COUNT(*)
-                    FROM categories c2
-                    WHERE c2.parent_id = c.id
-                ) AS children_count
-            FROM categories as c
-            LEFT JOIN categories cp ON c.parent_id = cp.id
-            WHERE c.id = @id
-            FOR UPDATE OF c";
-
-        await using var cmd = new NpgsqlCommand(sql, tx.Connection, tx);
-        cmd.Parameters.AddWithValue("id", id);
-
-        await using var reader = await cmd.ExecuteReaderAsync();
-
-        if (!await reader.ReadAsync())
-            return null;
-
-        var category = CategoriesRepositoryReader.SerializeWithSubcategoryCount(reader);
-        await reader.CloseAsync();
-        return category;
-    }
-
-    public static async Task<CategoryModelParent?> GetParentLockReader(long id, NpgsqlTransaction tx)
-    {
-        const string sql = @"
-            SELECT
-                id,
-                name,
-                parent_id IS NOT NULL AS has_parent
-            FROM categories
-            WHERE id = @id
-            FOR SHARE";
-
-        await using var cmd = new NpgsqlCommand(sql, tx.Connection, tx);
-        cmd.Parameters.AddWithValue("id", id);
-
-        await using var reader = await cmd.ExecuteReaderAsync();
-
-        if (!await reader.ReadAsync())
-            return null;
-
-        var category = CategoriesRepositoryReader.SerializeParent(reader);
-        await reader.CloseAsync();
-        return category;
     }
 
     public static async Task<long?> InsertWithTransaction(Record record, NpgsqlTransaction tx) 
     {
         const string sql = @"
             INSERT INTO records
-                (description, date, money_total, invisible, public, createdAt, updatedAt, deletedAt, status)
+                (note, value, date, workspace, invisible, public, creation_date, updated_date, deletion_date, status)
             VALUES
-                (@description, @date, @moneyTotal, @invisible, @public, @createdAt, @updatedAt, @deletedAt, @status)
+                (@note, @value, @date, @workspace, @invisible, @public, @creationDate, @updatedDate, @deletionDate, @status)
             RETURNING id";
 
         await using var cmd = new NpgsqlCommand(sql, tx.Connection, tx);
 
-        cmd.Parameters.AddWithValue("description", record.Description is null ? DBNull.Value : record.Description);
+        cmd.Parameters.AddWithValue("note", record.Note is null ? DBNull.Value : record.Note);
+        cmd.Parameters.AddWithValue("value", record.Value);
         cmd.Parameters.AddWithValue("date", record.Date);
-        cmd.Parameters.AddWithValue("moneyTotal", record.TotalMoney);
-        cmd.Parameters.AddWithValue("invisible", record.IsInvisible);
-        cmd.Parameters.AddWithValue("public", record.IsPublic);
-        cmd.Parameters.AddWithValue("createdAt", record.CreatedAt);
-        cmd.Parameters.AddWithValue("updatedAt", record.UpdatedAt);
-        cmd.Parameters.AddWithValue("deletedAt", record.DeletedAt is null ? DBNull.Value : record.DeletedAt);
-        cmd.Parameters.AddWithValue("status", RecordsRepositoryStatus.ConvertStatus(record));
+        cmd.Parameters.AddWithValue("workspace", record.Workspace);
+        cmd.Parameters.AddWithValue("invisible", record.Invisible);
+        cmd.Parameters.AddWithValue("public", record.Public);
+        cmd.Parameters.AddWithValue("creationDate", record.CreationDate);
+        cmd.Parameters.AddWithValue("updatedDate", record.UpdatedDate);
+        cmd.Parameters.AddWithValue("deletionDate", record.DeletedDate is null ? DBNull.Value : record.DeletedDate);
+        cmd.Parameters.AddWithValue("status", RecordStatusFormatter.Import(record.Status));
 
         var result = await cmd.ExecuteScalarAsync();
         if (result is null || result == DBNull.Value)
             return null;
 
         return Convert.ToInt64(result);
-    }*/
+    }
 
-    /*
-    public static async Task<bool> UpdateWithTransaction(Category category, NpgsqlTransaction tx)
+    public static async Task<bool> UpdateWithTransaction(Record record, NpgsqlTransaction tx)
     {
         const string sql = @"
-            UPDATE categories
+            UPDATE records
             SET
-                name = @name,
-                description = @description,
-                parent_id = @parentId
+                note = @note,
+                value = @value,
+                date = @date,
+                workspace = @workspace,
+                invisible = @invisible,
+                public = @public,
+                updated_date = @updatedDate,
+                deletion_date = @deletionDate,
+                status = @status
             WHERE id = @id";
 
         await using var cmd = new NpgsqlCommand(sql, tx.Connection, tx);
 
-        cmd.Parameters.AddWithValue("id", category.ID);
-        cmd.Parameters.AddWithValue("name", category.Name);
-        cmd.Parameters.AddWithValue("description", category.Description is null ? DBNull.Value : category.Description);
-        cmd.Parameters.AddWithValue("parentId", category.ParentID is null ? DBNull.Value : category.ParentID);
+        cmd.Parameters.AddWithValue("id", record.ID);
+        cmd.Parameters.AddWithValue("note", record.Note is null ? DBNull.Value : record.Note);
+        cmd.Parameters.AddWithValue("value", record.Value);
+        cmd.Parameters.AddWithValue("date", record.Date);
+        cmd.Parameters.AddWithValue("workspace", record.Workspace);
+        cmd.Parameters.AddWithValue("invisible", record.Invisible);
+        cmd.Parameters.AddWithValue("public", record.Public);
+        cmd.Parameters.AddWithValue("updatedDate", record.UpdatedDate);
+        cmd.Parameters.AddWithValue("deletionDate", record.DeletedDate is null ? DBNull.Value : record.DeletedDate);
+        cmd.Parameters.AddWithValue("status", RecordStatusFormatter.Import(record.Status));
 
         int affectedRows = await cmd.ExecuteNonQueryAsync();
         return affectedRows > 0;
-    }*/
+    }
 }
